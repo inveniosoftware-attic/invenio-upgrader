@@ -2,7 +2,7 @@
  Invenio-Upgrader v0.1.0
 =========================
 
-Invenio-Upgrader v0.1.0 was released on TBD, 2015.
+Invenio-Upgrader v0.1.0 was released on August 19, 2015.
 
 About
 -----
