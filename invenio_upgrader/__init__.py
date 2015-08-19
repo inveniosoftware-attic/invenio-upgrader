@@ -23,7 +23,7 @@ Usage (via ``inveniomanage``).
 
 .. code-block:: console
 
-    $ inveniomanage upgrader create recipe -p invenio.modules.search
+    $ inveniomanage upgrader create recipe -p invenio_search
     $ inveniomanage upgrader create release -r invenio -p invenio.base
     $ inveniomanage upgrader show applied
     $ inveniomanage upgrader show pending

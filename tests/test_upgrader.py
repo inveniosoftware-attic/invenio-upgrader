@@ -66,7 +66,7 @@ class TestInvenioUpgraderOrdering(InvenioTestCase):
         """
         Normal dependency graph
         """
-        from invenio.modules.upgrader.engine import InvenioUpgrader
+        from invenio_upgrader.engine import InvenioUpgrader
         upgrades = dictify([
             TestUpgrade('1', [], 'invenio'),
             TestUpgrade('2', ['1'], 'invenio'),
@@ -84,7 +84,7 @@ class TestInvenioUpgraderOrdering(InvenioTestCase):
         """
         Two independent graphs
         """
-        from invenio.modules.upgrader.engine import InvenioUpgrader
+        from invenio_upgrader.engine import InvenioUpgrader
         upgrades = dictify([
             TestUpgrade('1', [], 'invenio'),
             TestUpgrade('2', ['1'], 'invenio'),
@@ -111,7 +111,7 @@ class TestInvenioUpgraderOrdering(InvenioTestCase):
         """
         Cycle 2, 4, 3.
         """
-        from invenio.modules.upgrader.engine import InvenioUpgrader
+        from invenio_upgrader.engine import InvenioUpgrader
         upgrades = dictify([
             TestUpgrade('1', [], 'invenio'),
             TestUpgrade('2', ['1', '3'], 'invenio'),
@@ -128,7 +128,7 @@ class TestInvenioUpgraderOrdering(InvenioTestCase):
         """
         Missing dependency 0
         """
-        from invenio.modules.upgrader.engine import InvenioUpgrader
+        from invenio_upgrader.engine import InvenioUpgrader
         upgrades = dictify([
             TestUpgrade('1', [], 'invenio'),
             TestUpgrade('2', ['1'], 'invenio'),
@@ -142,7 +142,7 @@ class TestInvenioUpgraderOrdering(InvenioTestCase):
         """
         Missing dependency 0
         """
-        from invenio.modules.upgrader.engine import InvenioUpgrader
+        from invenio_upgrader.engine import InvenioUpgrader
         upgrades = dictify([
             TestUpgrade('1', [], 'invenio'),
             TestUpgrade('2', ['1'], 'invenio'),
@@ -161,7 +161,7 @@ class TestInvenioUpgraderOrdering(InvenioTestCase):
         """
         History
         """
-        from invenio.modules.upgrader.engine import InvenioUpgrader
+        from invenio_upgrader.engine import InvenioUpgrader
         upgrades = dictify([
             TestUpgrade('1', [], 'invenio'),
             TestUpgrade('2', ['1'], 'invenio'),
@@ -223,7 +223,7 @@ class TestInvenioUpgraderRecipe(InvenioTestCase):
 
     def test_create(self):
         """ Test creation of upgrades """
-        from invenio.modules.upgrader.commands import \
+        from invenio_upgrader.commands import \
             cmd_upgrade_create_standard_recipe
 
         cmd_upgrade_create_standard_recipe(
@@ -253,7 +253,7 @@ class TestInvenioUpgraderRecipe(InvenioTestCase):
 
     def test_create_load_engine(self):
         """ Test creation and loading of upgrades with engine """
-        from invenio.modules.upgrader.commands import \
+        from invenio_upgrader.commands import \
             cmd_upgrade_create_standard_recipe
 
         cmd_upgrade_create_standard_recipe(
@@ -265,7 +265,7 @@ class TestInvenioUpgraderRecipe(InvenioTestCase):
             date.today().strftime("%Y_%m_%d")
 
         # Test if upgrade can be found from the Upgrade
-        from invenio.modules.upgrader.engine import InvenioUpgrader
+        from invenio_upgrader.engine import InvenioUpgrader
         eng = InvenioUpgrader(packages=['invenio_upgrader_test'])
         upgrades = eng.get_upgrades(remove_applied=False)
         assert len(upgrades) == 1
@@ -274,7 +274,7 @@ class TestInvenioUpgraderRecipe(InvenioTestCase):
 
     def test_double_create(self):
         """ Test creation of upgrades """
-        from invenio.modules.upgrader.commands import \
+        from invenio_upgrader.commands import \
             cmd_upgrade_create_standard_recipe
 
         cmd_upgrade_create_standard_recipe('invenio_upgrader_test')
@@ -287,19 +287,19 @@ class TestInvenioUpgraderRecipe(InvenioTestCase):
         )
 
     def test_create_with_module(self):
-        from invenio.modules.upgrader.commands import \
+        from invenio_upgrader.commands import \
             cmd_upgrade_create_standard_recipe
 
         # Module instead of package
         self.assertRaises(
             SystemExit,
             cmd_upgrade_create_standard_recipe,
-            'invenio.modules.upgrader.engine'
+            'invenio_upgrader.engine'
         )
 
     def test_invalid_path(self):
         """ Test creation of upgrades """
-        from invenio.modules.upgrader.commands import \
+        from invenio_upgrader.commands import \
             cmd_upgrade_create_standard_recipe
 
         self.assertRaises(
@@ -311,8 +311,8 @@ class TestInvenioUpgraderRecipe(InvenioTestCase):
 
     def test_create_release(self):
         """ Test creation of upgrades """
-        from invenio.modules.upgrader.engine import InvenioUpgrader
-        from invenio.modules.upgrader.commands import \
+        from invenio_upgrader.engine import InvenioUpgrader
+        from invenio_upgrader.commands import \
             cmd_upgrade_create_standard_recipe, \
             cmd_upgrade_create_release_recipe
 

@@ -27,7 +27,7 @@ def run():
     """
     Command for applying upgrades
     """
-    from invenio.modules.upgrader.commands import cmd_upgrade
+    from invenio_upgrader.commands import cmd_upgrade
     cmd_upgrade()
 
 
@@ -36,7 +36,7 @@ def check():
     """
     Command for checking upgrades
     """
-    from invenio.modules.upgrader.commands import cmd_upgrade_check
+    from invenio_upgrader.commands import cmd_upgrade_check
     cmd_upgrade_check()
 
 
@@ -49,7 +49,7 @@ def pending():
     """
     Command for showing upgrades ready to be applied
     """
-    from invenio.modules.upgrader.commands import cmd_upgrade_show_pending
+    from invenio_upgrader.commands import cmd_upgrade_show_pending
     cmd_upgrade_show_pending()
 
 
@@ -58,7 +58,7 @@ def applied():
     """
     Command for showing all upgrades already applied.
     """
-    from invenio.modules.upgrader.commands import \
+    from invenio_upgrader.commands import \
         cmd_upgrade_show_applied
     cmd_upgrade_show_applied()
 
@@ -73,7 +73,7 @@ def release(path, repository):
     """
     Create a new release upgrade recipe (for developers).
     """
-    from invenio.modules.upgrader.commands import \
+    from invenio_upgrader.commands import \
         cmd_upgrade_create_release_recipe
     cmd_upgrade_create_release_recipe(path, repository)
 
@@ -97,7 +97,7 @@ def recipe(package, repository=None, depends_on=None, release=False,
     """
     Create a new upgrade recipe (for developers).
     """
-    from invenio.modules.upgrader.commands import \
+    from invenio_upgrader.commands import \
         cmd_upgrade_create_standard_recipe
     cmd_upgrade_create_standard_recipe(
         package,

@@ -31,7 +31,7 @@ towards errors.
 
 To create a new upgrade recipe just run:
 
-  inveniocfg --upgrade-create-standard-recipe=invenio,~/src/invenio/modules/miscutil/lib/upgrades/
+  inveniocfg --upgrade-create-standard-recipe=invenio,~/src/invenio_miscutil/lib/upgrades/
 """
 
 import warnings

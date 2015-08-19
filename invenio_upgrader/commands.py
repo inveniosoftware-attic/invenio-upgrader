@@ -56,7 +56,7 @@ UPGRADE_TEMPLATE = """# -*- coding: utf-8 -*-
 import warnings
 
 from invenio.ext.sqlalchemy import db
-from invenio.modules.upgrader.api import op
+from invenio_upgrader.api import op
 from invenio.utils.text import wait_for_user
 
 from sqlalchemy import *
