@@ -21,13 +21,15 @@ from invenio.legacy.dbquery import run_sql
 
 depends_on = ['invenio_2013_09_30_indexer_interface']
 
+
 def info():
-	return "New queue tables for virtual indexes: idxWORD/PAIR/PHRASExxQ"
+    return "New queue tables for virtual indexes: idxWORD/PAIR/PHRASExxQ"
+
 
 def do_upgrade():
-	global_id = 1
+    global_id = 1
 
-	run_sql("""CREATE TABLE IF NOT EXISTS idxWORD%02dQ (
+    run_sql("""CREATE TABLE IF NOT EXISTS idxWORD%02dQ (
 				  id mediumint(10) unsigned NOT NULL auto_increment,
 				  runtime datetime NOT NULL default '0000-00-00 00:00:00',
 				  id_bibrec_low mediumint(9) unsigned NOT NULL,
@@ -39,7 +41,7 @@ def do_upgrade():
 				  INDEX (runtime)
 				) ENGINE=MyISAM;""" % global_id)
 
-	run_sql("""CREATE TABLE IF NOT EXISTS idxPAIR%02dQ (
+    run_sql("""CREATE TABLE IF NOT EXISTS idxPAIR%02dQ (
 				  id mediumint(10) unsigned NOT NULL auto_increment,
 				  runtime datetime NOT NULL default '0000-00-00 00:00:00',
 				  id_bibrec_low mediumint(9) unsigned NOT NULL,
@@ -51,7 +53,7 @@ def do_upgrade():
 				  INDEX (runtime)
 				) ENGINE=MyISAM;""" % global_id)
 
-	run_sql("""CREATE TABLE IF NOT EXISTS idxPHRASE%02dQ (
+    run_sql("""CREATE TABLE IF NOT EXISTS idxPHRASE%02dQ (
 				  id mediumint(10) unsigned NOT NULL auto_increment,
 				  runtime datetime NOT NULL default '0000-00-00 00:00:00',
 				  id_bibrec_low mediumint(9) unsigned NOT NULL,
@@ -65,12 +67,14 @@ def do_upgrade():
 
 
 def estimate():
-	return 1
+    return 1
+
 
 def pre_upgrade():
-	pass
+    pass
+
 
 def post_upgrade():
-	print "NOTE: If you plan to change some of your indexes " \
-              "to virtual type, please note that you need to run " \
-              "new separate bibindex process for them"
+    print "NOTE: If you plan to change some of your indexes " \
+          "to virtual type, please note that you need to run " \
+          "new separate bibindex process for them"

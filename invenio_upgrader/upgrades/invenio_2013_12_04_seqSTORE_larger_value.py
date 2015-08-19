@@ -23,12 +23,15 @@ from invenio.utils.text import wait_for_user
 
 depends_on = ['invenio_release_1_1_0']
 
+
 def info():
     return "Larger values allowed for seqSTORE.seq_value"
+
 
 def do_upgrade():
     """ Implement your upgrades here  """
     run_sql("ALTER TABLE seqSTORE MODIFY COLUMN seq_value varchar(60);")
+
 
 def estimate():
     """  Estimate running time of upgrade in seconds (optional). """

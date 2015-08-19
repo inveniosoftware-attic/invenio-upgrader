@@ -21,8 +21,10 @@ from invenio.legacy.dbquery import run_sql
 
 depends_on = ['invenio_release_1_1_0']
 
+
 def info():
     return "Tables for new webauthorlist module"
+
 
 def do_upgrade():
     run_sql("""
@@ -101,6 +103,7 @@ def do_upgrade():
       INDEX(`author_item`),
       INDEX(`paper_id`)
     ) ENGINE=MyISAM;""")
+
 
 def estimate():
     """  Estimate running time of upgrade in seconds (optional). """

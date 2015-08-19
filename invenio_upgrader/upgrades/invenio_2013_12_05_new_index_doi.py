@@ -23,6 +23,7 @@ from invenio.legacy.dbquery import run_sql
 
 depends_on = ['invenio_2013_09_25_virtual_indexes']
 
+
 def info():
     return "New DOI index"
 
@@ -85,15 +86,22 @@ def do_upgrade_atlantis():
             ) ENGINE=MyISAM;
             """ % doi_index)
     run_sql("""INSERT INTO idxINDEX VALUES (%02d,'doi','This index contains words/phrases from DOI fields','0000-00-00 00:00:00', '', 'native','','No','No','No', 'BibIndexDOITokenizer')""" % doi_index)
-    run_sql("""INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (1, %02d)""" % doi_index)
+    run_sql(
+        """INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (1, %02d)""" %
+        doi_index)
     run_sql("""INSERT INTO field VALUES (18,'doi','doi')""")
-    run_sql("""INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (%02d, 18)""" % doi_index)
+    run_sql(
+        """INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (%02d, 18)""" %
+        doi_index)
+
 
 def estimate():
     return 1
 
+
 def pre_upgrade():
     pass
+
 
 def post_upgrade():
     pass

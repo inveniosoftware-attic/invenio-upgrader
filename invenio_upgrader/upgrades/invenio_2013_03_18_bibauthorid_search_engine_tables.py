@@ -22,8 +22,10 @@ from invenio.legacy.dbquery import run_sql
 
 depends_on = ['invenio_release_1_1_0']
 
+
 def info():
     return "Creates the bibauthorid search engine tables"
+
 
 def do_upgrade():
     warnings.filterwarnings('ignore')
@@ -41,6 +43,6 @@ def do_upgrade():
                 PRIMARY KEY (`qgram`)
                ) ENGINE=MyISAM""")
 
+
 def estimate():
     return 1
-

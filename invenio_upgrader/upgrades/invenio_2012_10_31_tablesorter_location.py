@@ -26,8 +26,10 @@ from invenio.config import CFG_WEBDIR
 
 depends_on = ['invenio_release_1_1_0']
 
+
 def info():
     return "Standardisation of the jQuery tablesorter location"
+
 
 def do_upgrade():
     os.system("true")
@@ -35,11 +37,14 @@ def do_upgrade():
     #os.system("unzip /tmp/jquery.tablesorter.zip -d %s/js/tablesorter" % CFG_WEBDIR)
     #os.system("rm -f /tmp/jquery.tablesorter.zip")
 
+
 def estimate():
     return 10
 
+
 def pre_upgrade():
     pass
+
 
 def post_upgrade():
     pass

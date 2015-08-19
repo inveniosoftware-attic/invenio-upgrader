@@ -23,12 +23,15 @@ from invenio.utils.text import wait_for_user
 
 depends_on = ['invenio_release_1_1_0']
 
+
 def info():
     return "Introduces oaiREPOSITORY last_updated column"
+
 
 def do_upgrade():
     """ Implement your upgrades here  """
     run_sql("ALTER TABLE oaiREPOSITORY ADD COLUMN last_updated datetime NOT NULL default '1970-01-01' AFTER setRecList;")
+
 
 def estimate():
     """  Estimate running time of upgrade in seconds (optional). """

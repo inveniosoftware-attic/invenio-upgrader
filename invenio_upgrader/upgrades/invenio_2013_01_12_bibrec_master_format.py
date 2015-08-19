@@ -22,24 +22,31 @@ from invenio.legacy.dbquery import run_sql
 
 depends_on = ['invenio_release_1_1_0']
 
+
 def info():
     return "New bibrec.master_format column"
+
 
 def do_upgrade():
     create_statement = run_sql('SHOW CREATE TABLE bibrec')[0][1]
     if '`master_format` varchar(16)' not in create_statement:
-        run_sql("ALTER TABLE bibrec ADD COLUMN master_format varchar(16) NOT NULL default 'marc'")
+        run_sql(
+            "ALTER TABLE bibrec ADD COLUMN master_format varchar(16) NOT NULL default 'marc'")
 
     try:
         import pyparsing
     except ImportError:
-        warnings.warn("Pyparsing is not installed in your machine!, please consider installing it")
+        warnings.warn(
+            "Pyparsing is not installed in your machine!, please consider installing it")
+
 
 def estimate():
     return 1
 
+
 def pre_upgrade():
     pass
+
 
 def post_upgrade():
     pass

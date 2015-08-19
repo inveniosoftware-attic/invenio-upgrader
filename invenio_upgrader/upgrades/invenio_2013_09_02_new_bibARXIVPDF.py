@@ -23,8 +23,10 @@ from invenio.utils.text import wait_for_user
 
 depends_on = ['invenio_release_1_1_0']
 
+
 def info():
     return "New pdfchecker (bibARXIVPDF) table"
+
 
 def do_upgrade():
     """ Implement your upgrades here  """
@@ -36,6 +38,7 @@ def do_upgrade():
   PRIMARY KEY (id_bibrec),
   KEY status (status)
 ) ENGINE=MyISAM""")
+
 
 def estimate():
     """  Estimate running time of upgrade in seconds (optional). """

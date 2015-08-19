@@ -21,8 +21,10 @@ from invenio.legacy.dbquery import run_sql
 
 depends_on = ['invenio_release_1_1_0']
 
+
 def info():
     return "New bibsched status (schSTATUS) table"
+
 
 def do_upgrade():
     run_sql("""CREATE TABLE IF NOT EXISTS schSTATUS (
@@ -31,6 +33,7 @@ def do_upgrade():
   PRIMARY KEY (name)
 ) ENGINE=MyISAM
     """)
+
 
 def estimate():
     return 1

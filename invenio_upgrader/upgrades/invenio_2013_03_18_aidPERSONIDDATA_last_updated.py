@@ -23,11 +23,14 @@ from invenio.utils.text import wait_for_user
 
 depends_on = ['invenio_release_1_1_0']
 
+
 def info():
     return "Introduces aidPERSONIDDATA last_updated column and new table indexes"
 
+
 def do_upgrade():
-    column_exists = run_sql("SHOW COLUMNS FROM `aidPERSONIDDATA` LIKE 'last_updated'")
+    column_exists = run_sql(
+        "SHOW COLUMNS FROM `aidPERSONIDDATA` LIKE 'last_updated'")
     if not column_exists:
         run_sql("""
                 ALTER TABLE aidPERSONIDDATA
@@ -43,6 +46,6 @@ def do_upgrade():
 		ADD INDEX `personid-flag-b` (`personid`, `flag`)
                 """)
 
+
 def estimate():
     return 1
-

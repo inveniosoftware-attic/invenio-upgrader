@@ -23,19 +23,25 @@ from invenio.utils.text import wait_for_user
 
 depends_on = ['invenio_release_1_1_0']
 
+
 def info():
     return "New xtrJOB.last_recid column"
+
 
 def do_upgrade():
     create_statement = run_sql('SHOW CREATE TABLE xtrJOB')[0][1]
     if '`last_recid` mediumint(8)' not in create_statement:
-        run_sql("ALTER TABLE xtrJOB ADD COLUMN last_recid mediumint(8) unsigned NOT NULL")
+        run_sql(
+            "ALTER TABLE xtrJOB ADD COLUMN last_recid mediumint(8) unsigned NOT NULL")
+
 
 def estimate():
     return 1
 
+
 def pre_upgrade():
     pass
+
 
 def post_upgrade():
     pass

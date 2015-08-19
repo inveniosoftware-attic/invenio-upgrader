@@ -24,18 +24,19 @@ from invenio.legacy.dbquery import run_sql
 
 depends_on = ['invenio_2013_03_20_idxINDEX_synonym_kb']
 
+
 def info():
     return "Introduces new column for idxINDEX table: remove_stopwords"
 
 
 def do_upgrade():
-    #first step: change tables
+    # first step: change tables
     stmt = run_sql('SHOW CREATE TABLE idxINDEX')[0][1]
     if '`remove_stopwords` varchar' not in stmt:
         run_sql("ALTER TABLE idxINDEX ADD COLUMN remove_stopwords varchar(255) NOT NULL default '' AFTER synonym_kbrs")
-    #second step: fill tables
+    # second step: fill tables
     run_sql("UPDATE idxINDEX SET remove_stopwords='No'")
-    #third step: load from invenio.cfg if necessary
+    # third step: load from invenio.cfg if necessary
     from invenio.config import CFG_BIBINDEX_REMOVE_STOPWORDS
     if CFG_BIBINDEX_REMOVE_STOPWORDS:
         if CFG_BIBINDEX_REMOVE_STOPWORDS == 1:
@@ -45,8 +46,10 @@ def do_upgrade():
 def estimate():
     return 1
 
+
 def pre_upgrade():
     pass
+
 
 def post_upgrade():
     print('NOTE: please double check your new index stopword settings in BibIndex Admin Interface.')

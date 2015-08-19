@@ -23,8 +23,10 @@ from invenio.utils.text import wait_for_user
 
 depends_on = ['invenio_release_1_1_0']
 
+
 def info():
     return "New hidden format added to serve as helper in generating WebAuthorProfile pages"
+
 
 def do_upgrade():
     """ Implement your upgrades here  """
@@ -37,10 +39,12 @@ def estimate():
     """  Estimate running time of upgrade in seconds (optional). """
     return 1
 
+
 def pre_upgrade():
     """  Run pre-upgrade checks (optional). """
     # Example of raising errors:
     # raise RuntimeError("Description of error 1", "Description of error 2")
+
 
 def post_upgrade():
     """  Run post-upgrade checks (optional). """

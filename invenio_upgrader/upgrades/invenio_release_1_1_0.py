@@ -42,12 +42,15 @@ DB_VERSION = None
 
 depends_on = []
 
+
 def info():
     return "Invenio 1.0.x to 1.1.0 upgrade"
+
 
 def estimate():
     """ Return estimate of upgrade time in seconds """
     return 10
+
 
 def do_upgrade():
     """ Perform upgrade """
@@ -55,7 +58,7 @@ def do_upgrade():
     session_tbl = _get_table_info('session')
     if (DB_VERSION == '1.0.0' or DB_VERSION == 'master') and \
             'session_expiry' not in session_tbl['indexes']:
-        _run_sql_ignore("ALTER TABLE session ADD KEY session_expiry " \
+        _run_sql_ignore("ALTER TABLE session ADD KEY session_expiry "
                         "(session_expiry)")
 
     # Create tables
@@ -408,59 +411,100 @@ def do_upgrade():
         """)
 
     # Insert and alter table queries
-    _run_sql_ignore("INSERT INTO sbmALLFUNCDESCR VALUES ('Set_Embargo','Set an embargo on all the documents of a given record.');")
-    _run_sql_ignore("INSERT INTO sbmFUNDESC VALUES ('Set_Embargo','date_file');")
-    _run_sql_ignore("INSERT INTO sbmFUNDESC VALUES ('Set_Embargo','date_format');")
-    _run_sql_ignore("INSERT INTO sbmFUNDESC VALUES ('User_is_Record_Owner_or_Curator','curator_role');")
-    _run_sql_ignore("INSERT INTO sbmFUNDESC VALUES ('User_is_Record_Owner_or_Curator','curator_flag');")
-    _run_sql_ignore("INSERT INTO sbmFUNDESC VALUES ('Move_Photos_to_Storage','iconformat');")
+    _run_sql_ignore(
+        "INSERT INTO sbmALLFUNCDESCR VALUES ('Set_Embargo','Set an embargo on all the documents of a given record.');")
+    _run_sql_ignore(
+        "INSERT INTO sbmFUNDESC VALUES ('Set_Embargo','date_file');")
+    _run_sql_ignore(
+        "INSERT INTO sbmFUNDESC VALUES ('Set_Embargo','date_format');")
+    _run_sql_ignore(
+        "INSERT INTO sbmFUNDESC VALUES ('User_is_Record_Owner_or_Curator','curator_role');")
+    _run_sql_ignore(
+        "INSERT INTO sbmFUNDESC VALUES ('User_is_Record_Owner_or_Curator','curator_flag');")
+    _run_sql_ignore(
+        "INSERT INTO sbmFUNDESC VALUES ('Move_Photos_to_Storage','iconformat');")
     _run_sql_ignore("INSERT INTO format (name, code, description, content_type, visibility) VALUES ('Podcast', 'xp', 'Sample format suitable for multimedia feeds, such as podcasts', 'application/rss+xml', 0);")
-    _run_sql_ignore("ALTER TABLE accMAILCOOKIE ADD INDEX expiration (expiration);")
-    _run_sql_ignore("UPDATE sbmFUNDESC SET function='Move_CKEditor_Files_to_Storage' WHERE function='Move_FCKeditor_Files_to_Storage';")
+    _run_sql_ignore(
+        "ALTER TABLE accMAILCOOKIE ADD INDEX expiration (expiration);")
+    _run_sql_ignore(
+        "UPDATE sbmFUNDESC SET function='Move_CKEditor_Files_to_Storage' WHERE function='Move_FCKeditor_Files_to_Storage';")
     _run_sql_ignore("UPDATE sbmALLFUNCDESCR SET function='Move_CKEditor_Files_to_Storage', description='Transfer files attached to the record with the CKEditor' WHERE function='Move_FCKeditor_Files_to_Storage';")
-    _run_sql_ignore("UPDATE sbmFUNCTIONS SET function='Move_CKEditor_Files_to_Storage' WHERE function='Move_FCKeditor_Files_to_Storage';")
-    _run_sql_ignore("ALTER TABLE schTASK CHANGE proc proc varchar(255) NOT NULL;")
-    _run_sql_ignore("ALTER TABLE schTASK ADD sequenceid int(8) NULL default NULL;")
+    _run_sql_ignore(
+        "UPDATE sbmFUNCTIONS SET function='Move_CKEditor_Files_to_Storage' WHERE function='Move_FCKeditor_Files_to_Storage';")
+    _run_sql_ignore(
+        "ALTER TABLE schTASK CHANGE proc proc varchar(255) NOT NULL;")
+    _run_sql_ignore(
+        "ALTER TABLE schTASK ADD sequenceid int(8) NULL default NULL;")
     _run_sql_ignore("ALTER TABLE schTASK ADD INDEX sequenceid (sequenceid);")
-    _run_sql_ignore("ALTER TABLE hstTASK CHANGE proc proc varchar(255) NOT NULL;")
-    _run_sql_ignore("ALTER TABLE hstTASK ADD sequenceid int(8) NULL default NULL;")
+    _run_sql_ignore(
+        "ALTER TABLE hstTASK CHANGE proc proc varchar(255) NOT NULL;")
+    _run_sql_ignore(
+        "ALTER TABLE hstTASK ADD sequenceid int(8) NULL default NULL;")
     _run_sql_ignore("ALTER TABLE hstTASK ADD INDEX sequenceid (sequenceid);")
-    _run_sql_ignore("ALTER TABLE session CHANGE session_object session_object longblob;")
-    _run_sql_ignore("ALTER TABLE session CHANGE session_expiry session_expiry datetime NOT NULL default '0000-00-00 00:00:00';")
-    _run_sql_ignore("ALTER TABLE oaiREPOSITORY CHANGE setSpec setSpec varchar(255) NOT NULL default 'GLOBAL_SET';")
-    _run_sql_ignore("UPDATE oaiREPOSITORY SET setSpec='GLOBAL_SET' WHERE setSpec='';")
-    _run_sql_ignore("ALTER TABLE user_query_basket ADD COLUMN alert_desc TEXT DEFAULT NULL AFTER alert_name;")
-    _run_sql_ignore("INSERT INTO sbmALLFUNCDESCR VALUES ('Link_Records','Link two records toghether via MARC');")
-    _run_sql_ignore("INSERT INTO sbmALLFUNCDESCR VALUES ('Video_Processing',NULL);")
+    _run_sql_ignore(
+        "ALTER TABLE session CHANGE session_object session_object longblob;")
+    _run_sql_ignore(
+        "ALTER TABLE session CHANGE session_expiry session_expiry datetime NOT NULL default '0000-00-00 00:00:00';")
+    _run_sql_ignore(
+        "ALTER TABLE oaiREPOSITORY CHANGE setSpec setSpec varchar(255) NOT NULL default 'GLOBAL_SET';")
+    _run_sql_ignore(
+        "UPDATE oaiREPOSITORY SET setSpec='GLOBAL_SET' WHERE setSpec='';")
+    _run_sql_ignore(
+        "ALTER TABLE user_query_basket ADD COLUMN alert_desc TEXT DEFAULT NULL AFTER alert_name;")
+    _run_sql_ignore(
+        "INSERT INTO sbmALLFUNCDESCR VALUES ('Link_Records','Link two records toghether via MARC');")
+    _run_sql_ignore(
+        "INSERT INTO sbmALLFUNCDESCR VALUES ('Video_Processing',NULL);")
     _run_sql_ignore("INSERT INTO sbmFUNDESC VALUES ('Link_Records','edsrn');")
     _run_sql_ignore("INSERT INTO sbmFUNDESC VALUES ('Link_Records','edsrn2');")
-    _run_sql_ignore("INSERT INTO sbmFUNDESC VALUES ('Link_Records','directRelationship');")
-    _run_sql_ignore("INSERT INTO sbmFUNDESC VALUES ('Link_Records','reverseRelationship');")
-    _run_sql_ignore("INSERT INTO sbmFUNDESC VALUES ('Link_Records','keep_original_edsrn2');")
-    _run_sql_ignore("INSERT INTO sbmFUNDESC VALUES ('Video_Processing','aspect');")
-    _run_sql_ignore("INSERT INTO sbmFUNDESC VALUES ('Video_Processing','batch_template');")
-    _run_sql_ignore("INSERT INTO sbmFUNDESC VALUES ('Video_Processing','title');")
-    _run_sql_ignore("INSERT INTO sbmALLFUNCDESCR VALUES ('Set_RN_From_Sysno', 'Set the value of global rn variable to the report number identified by sysno (recid)');")
-    _run_sql_ignore("INSERT INTO sbmFUNDESC VALUES ('Set_RN_From_Sysno','edsrn');")
-    _run_sql_ignore("INSERT INTO sbmFUNDESC VALUES ('Set_RN_From_Sysno','rep_tags');")
-    _run_sql_ignore("INSERT INTO sbmFUNDESC VALUES ('Set_RN_From_Sysno','record_search_pattern');")
-    _run_sql_ignore("UPDATE externalcollection SET name='INSPIRE' where name='SPIRES HEP';")
-    _run_sql_ignore("INSERT INTO sbmFUNDESC VALUES ('Report_Number_Generation','initialvalue');")
-    _run_sql_ignore("INSERT INTO sbmALLFUNCDESCR VALUES ('Notify_URL','Access URL, possibly to post content');")
+    _run_sql_ignore(
+        "INSERT INTO sbmFUNDESC VALUES ('Link_Records','directRelationship');")
+    _run_sql_ignore(
+        "INSERT INTO sbmFUNDESC VALUES ('Link_Records','reverseRelationship');")
+    _run_sql_ignore(
+        "INSERT INTO sbmFUNDESC VALUES ('Link_Records','keep_original_edsrn2');")
+    _run_sql_ignore(
+        "INSERT INTO sbmFUNDESC VALUES ('Video_Processing','aspect');")
+    _run_sql_ignore(
+        "INSERT INTO sbmFUNDESC VALUES ('Video_Processing','batch_template');")
+    _run_sql_ignore(
+        "INSERT INTO sbmFUNDESC VALUES ('Video_Processing','title');")
+    _run_sql_ignore(
+        "INSERT INTO sbmALLFUNCDESCR VALUES ('Set_RN_From_Sysno', 'Set the value of global rn variable to the report number identified by sysno (recid)');")
+    _run_sql_ignore(
+        "INSERT INTO sbmFUNDESC VALUES ('Set_RN_From_Sysno','edsrn');")
+    _run_sql_ignore(
+        "INSERT INTO sbmFUNDESC VALUES ('Set_RN_From_Sysno','rep_tags');")
+    _run_sql_ignore(
+        "INSERT INTO sbmFUNDESC VALUES ('Set_RN_From_Sysno','record_search_pattern');")
+    _run_sql_ignore(
+        "UPDATE externalcollection SET name='INSPIRE' where name='SPIRES HEP';")
+    _run_sql_ignore(
+        "INSERT INTO sbmFUNDESC VALUES ('Report_Number_Generation','initialvalue');")
+    _run_sql_ignore(
+        "INSERT INTO sbmALLFUNCDESCR VALUES ('Notify_URL','Access URL, possibly to post content');")
     _run_sql_ignore("INSERT INTO sbmFUNDESC VALUES ('Notify_URL','url');")
     _run_sql_ignore("INSERT INTO sbmFUNDESC VALUES ('Notify_URL','data');")
-    _run_sql_ignore("INSERT INTO sbmFUNDESC VALUES ('Notify_URL','admin_emails');")
-    _run_sql_ignore("INSERT INTO sbmFUNDESC VALUES ('Notify_URL','content_type');")
-    _run_sql_ignore("INSERT INTO sbmFUNDESC VALUES ('Notify_URL','attempt_times');")
-    _run_sql_ignore("INSERT INTO sbmFUNDESC VALUES ('Notify_URL','attempt_sleeptime');")
+    _run_sql_ignore(
+        "INSERT INTO sbmFUNDESC VALUES ('Notify_URL','admin_emails');")
+    _run_sql_ignore(
+        "INSERT INTO sbmFUNDESC VALUES ('Notify_URL','content_type');")
+    _run_sql_ignore(
+        "INSERT INTO sbmFUNDESC VALUES ('Notify_URL','attempt_times');")
+    _run_sql_ignore(
+        "INSERT INTO sbmFUNDESC VALUES ('Notify_URL','attempt_sleeptime');")
     _run_sql_ignore("INSERT INTO sbmFUNDESC VALUES ('Notify_URL','user');")
     _run_sql_ignore("ALTER TABLE bibfmt DROP COLUMN id;")
     _run_sql_ignore("ALTER TABLE bibfmt ADD PRIMARY KEY (id_bibrec, format);")
     _run_sql_ignore("ALTER TABLE bibfmt DROP KEY id_bibrec;")
     _run_sql_ignore("ALTER TABLE bibfmt ADD KEY last_updated (last_updated);")
-    _run_sql_ignore("ALTER TABLE user_query_basket ADD COLUMN alert_recipient TEXT DEFAULT NULL AFTER alert_desc;")
-    _run_sql_ignore("ALTER TABLE format ADD COLUMN last_updated datetime NOT NULL default '0000-00-00' AFTER visibility;")
-    _run_sql_ignore("REPLACE INTO sbmFIELDDESC VALUES ('Upload_Files',NULL,'','R',NULL,NULL,NULL,NULL,NULL,'\"\"\"\r\nThis is an example of element that creates a file upload interface.\r\nClone it, customize it and integrate it into your submission. Then add function \r\n\\'Move_Uploaded_Files_to_Storage\\' to your submission functions list, in order for files \r\nuploaded with this interface to be attached to the record. More information in \r\nthe WebSubmit admin guide.\r\n\"\"\"\r\nfrom invenio.legacy.bibdocfile.managedocfiles import create_file_upload_interface\r\nfrom invenio.websubmit_functions.Shared_Functions import ParamFromFile\r\n\r\nindir = ParamFromFile(os.path.join(curdir, \\'indir\\'))\r\ndoctype = ParamFromFile(os.path.join(curdir, \\'doctype\\'))\r\naccess = ParamFromFile(os.path.join(curdir, \\'access\\'))\r\ntry:\r\n    sysno = int(ParamFromFile(os.path.join(curdir, \\'SN\\')).strip())\r\nexcept:\r\n    sysno = -1\r\nln = ParamFromFile(os.path.join(curdir, \\'ln\\'))\r\n\r\n\"\"\"\r\nRun the following to get the list of parameters of function \\'create_file_upload_interface\\':\r\necho -e \\'from invenio.legacy.bibdocfile.managedocfiles import create_file_upload_interface as f\\nprint f.__doc__\\' | python\r\n\"\"\"\r\ntext = create_file_upload_interface(recid=sysno,\r\n                                 print_outside_form_tag=False,\r\n                                 include_headers=True,\r\n                                 ln=ln,\r\n                                 doctypes_and_desc=[(\\'main\\',\\'Main document\\'),\r\n                                                    (\\'additional\\',\\'Figure, schema, etc.\\')],\r\n                                 can_revise_doctypes=[\\'*\\'],\r\n                                 can_describe_doctypes=[\\'main\\'],\r\n                                 can_delete_doctypes=[\\'additional\\'],\r\n                                 can_rename_doctypes=[\\'main\\'],\r\n                                 sbm_indir=indir, sbm_doctype=doctype, sbm_access=access)[1]\r\n','0000-00-00','0000-00-00',NULL,NULL,0);")
+    _run_sql_ignore(
+        "ALTER TABLE user_query_basket ADD COLUMN alert_recipient TEXT DEFAULT NULL AFTER alert_desc;")
+    _run_sql_ignore(
+        "ALTER TABLE format ADD COLUMN last_updated datetime NOT NULL default '0000-00-00' AFTER visibility;")
+    _run_sql_ignore(
+        "REPLACE INTO sbmFIELDDESC VALUES ('Upload_Files',NULL,'','R',NULL,NULL,NULL,NULL,NULL,'\"\"\"\r\nThis is an example of element that creates a file upload interface.\r\nClone it, customize it and integrate it into your submission. Then add function \r\n\\'Move_Uploaded_Files_to_Storage\\' to your submission functions list, in order for files \r\nuploaded with this interface to be attached to the record. More information in \r\nthe WebSubmit admin guide.\r\n\"\"\"\r\nfrom invenio.legacy.bibdocfile.managedocfiles import create_file_upload_interface\r\nfrom invenio.websubmit_functions.Shared_Functions import ParamFromFile\r\n\r\nindir = ParamFromFile(os.path.join(curdir, \\'indir\\'))\r\ndoctype = ParamFromFile(os.path.join(curdir, \\'doctype\\'))\r\naccess = ParamFromFile(os.path.join(curdir, \\'access\\'))\r\ntry:\r\n    sysno = int(ParamFromFile(os.path.join(curdir, \\'SN\\')).strip())\r\nexcept:\r\n    sysno = -1\r\nln = ParamFromFile(os.path.join(curdir, \\'ln\\'))\r\n\r\n\"\"\"\r\nRun the following to get the list of parameters of function \\'create_file_upload_interface\\':\r\necho -e \\'from invenio.legacy.bibdocfile.managedocfiles import create_file_upload_interface as f\\nprint f.__doc__\\' | python\r\n\"\"\"\r\ntext = create_file_upload_interface(recid=sysno,\r\n                                 print_outside_form_tag=False,\r\n                                 include_headers=True,\r\n                                 ln=ln,\r\n                                 doctypes_and_desc=[(\\'main\\',\\'Main document\\'),\r\n                                                    (\\'additional\\',\\'Figure, schema, etc.\\')],\r\n                                 can_revise_doctypes=[\\'*\\'],\r\n                                 can_describe_doctypes=[\\'main\\'],\r\n                                 can_delete_doctypes=[\\'additional\\'],\r\n                                 can_rename_doctypes=[\\'main\\'],\r\n                                 sbm_indir=indir, sbm_doctype=doctype, sbm_access=access)[1]\r\n','0000-00-00','0000-00-00',NULL,NULL,0);")
+
 
 def pre_upgrade():
     """
@@ -474,15 +518,17 @@ def pre_upgrade():
     DB_VERSION = _invenio_schema_version_guesser()
 
     if DB_VERSION == 'unknown':
-        raise RuntimeError("Your Invenio database schema version could not be"
+        raise RuntimeError(
+            "Your Invenio database schema version could not be"
             " determined. Please upgrade to Invenio v1.0.0 first.")
 
     if DB_VERSION == 'pre-0.99.0':
         raise RuntimeError("Upgrading from Invenio versions prior to 0.99 is"
-            " not supported. Please upgrade to 0.99.0 first.")
+                           " not supported. Please upgrade to 0.99.0 first.")
 
     if DB_VERSION == '0.99.0':
-        raise RuntimeError("It seems like you are running Invenio version "
+        raise RuntimeError(
+            "It seems like you are running Invenio version "
             "0.99.0. Please run the upgrade in the following special way:\n"
             "make install\ninveniocfg --update-all\n"
             "make update-v0.99.0-tables\nmake update-v0.99.6-tables\n"
@@ -491,7 +537,8 @@ def pre_upgrade():
             " Invenio 0.99.0.")
 
     if DB_VERSION in ['0.99.x', '0.99.x-1.0.0']:
-        raise RuntimeError("It seems like you are running Invenio version "
+        raise RuntimeError(
+            "It seems like you are running Invenio version "
             "v0.99.1-v0.99.x. Please run the upgrade in the following special"
             " way:\nmake install\ninveniocfg --update-all\n"
             "make update-v0.99.6-tables\n"
@@ -501,7 +548,7 @@ def pre_upgrade():
 
     if DB_VERSION == 'master':
         warnings.warn("Invenio database schema is on a development version"
-            " between 1.0.x and 1.1.0")
+                      " between 1.0.x and 1.1.0")
 
         # Run import here, since we are on 1.0-1.1 we know the import will work
         from invenio.utils.text import wait_for_user
@@ -528,11 +575,11 @@ def _create_table(tables, tblname, ddl_stmt):
         res = run_sql('SHOW CREATE TABLE %s' % tblname)
         your_ddl = res[0][1]
         warnings.warn("Table '%s' already exists but was not supposed to."
-               " Please manually compare the CREATE-statment used to create"
-               " the table in your database:\n\n%s\n\n"
-               "against the following CREATE-statement:\n%s\n"
-               % (tblname, "\n".join([x.strip() for x in your_ddl.splitlines()])
-                  , "\n".join([x.strip() for x in ddl_stmt.splitlines()])))
+                      " Please manually compare the CREATE-statment used to create"
+                      " the table in your database:\n\n%s\n\n"
+                      "against the following CREATE-statement:\n%s\n" % (tblname,
+                                                                         "\n".join([x.strip() for x in your_ddl.splitlines()]),
+                                                                         "\n".join([x.strip() for x in ddl_stmt.splitlines()])))
 
 
 def _get_table_info(tblname):

@@ -21,16 +21,20 @@ from invenio.legacy.dbquery import run_sql
 
 depends_on = ['invenio_release_1_1_0']
 
+
 def info():
     return "Increase the size of rnkDOWNLOADS.file_format"
+
 
 def do_upgrade():
     """ Implement your upgrades here  """
     run_sql("ALTER TABLE rnkDOWNLOADS CHANGE file_format file_format varchar(50) NULL default NULL")
 
+
 def estimate():
     """  Estimate running time of upgrade in seconds (optional). """
     return 1
+
 
 def pre_upgrade():
     """  Run pre-upgrade checks (optional). """

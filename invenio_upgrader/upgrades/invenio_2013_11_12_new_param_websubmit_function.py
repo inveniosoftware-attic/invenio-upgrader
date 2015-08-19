@@ -21,11 +21,14 @@ from invenio.legacy.dbquery import run_sql
 
 depends_on = ['invenio_release_1_1_0']
 
+
 def info():
     return "New 'deferRelatedFormatsCreation' parameter for Create_Upload_Files_Interface WebSubmit function"
 
+
 def do_upgrade():
     run_sql("""INSERT INTO sbmFUNDESC VALUES ('Create_Upload_Files_Interface','deferRelatedFormatsCreation')""")
+
 
 def estimate():
     """  Estimate running time of upgrade in seconds (optional). """

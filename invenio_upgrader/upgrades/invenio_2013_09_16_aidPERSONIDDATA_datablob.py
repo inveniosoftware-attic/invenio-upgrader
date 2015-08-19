@@ -24,21 +24,25 @@ from msgpack import packb as serialize
 
 depends_on = ['invenio_release_1_1_0']
 
+
 def info():
     return "Introduces aidPERSONIDDATA datablob column"
 
+
 def do_upgrade():
-    column_exists = run_sql("SHOW COLUMNS FROM `aidPERSONIDDATA` LIKE 'datablob'")
+    column_exists = run_sql(
+        "SHOW COLUMNS FROM `aidPERSONIDDATA` LIKE 'datablob'")
     if not column_exists:
         run_sql("""ALTER TABLE aidPERSONIDDATA
                    ADD COLUMN datablob LONGBLOB NULL DEFAULT NULL AFTER data;""")
 
-    run_sql("""ALTER TABLE aidPERSONIDDATA MODIFY data VARCHAR( 256 ) NULL DEFAULT NULL""")
+    run_sql(
+        """ALTER TABLE aidPERSONIDDATA MODIFY data VARCHAR( 256 ) NULL DEFAULT NULL""")
 
     pids_with_tickets = set(run_sql("""select personid
                                        from aidPERSONIDDATA
                                        where tag like %s""",
-                                       ('rt_%',) ))
+                                    ('rt_%',)))
     pids_with_tickets = [pid[0] for pid in pids_with_tickets]
 
     for pid in pids_with_tickets:
@@ -46,10 +50,11 @@ def do_upgrade():
                                      from aidPERSONIDDATA
                                      where personid=%s
                                      and tag like 'rt_%%'""",
-                                     (pid,) )
+                                  (pid,))
         request_tickets = sorted(request_tickets, key=itemgetter(2))
         request_tickets = groupby(request_tickets, key=itemgetter(2))
-        request_tickets = [[[(i[0][3:], i[1]) for i in tinfo], tid] for tid, tinfo in request_tickets]
+        request_tickets = [[[(i[0][3:], i[1]) for i in tinfo], tid]
+                           for tid, tinfo in request_tickets]
 
         new_request_tickets = list()
         for request_ticket_attributes, tid in request_tickets:
@@ -71,14 +76,19 @@ def do_upgrade():
         new_request_tickets_num = len(new_request_tickets)
         new_request_tickets = serialize(new_request_tickets)
 
-        run_sql("""insert into aidPERSONIDDATA
+        run_sql(
+            """insert into aidPERSONIDDATA
                    (personid, tag, datablob, opt1)
                    values (%s, %s, %s, %s)""",
-                   (pid, 'request_tickets', new_request_tickets, new_request_tickets_num) )
+            (pid,
+             'request_tickets',
+             new_request_tickets,
+             new_request_tickets_num))
 
     run_sql("""delete from aidPERSONIDDATA
                where tag like %s""",
-               ('rt_%', ))
+            ('rt_%', ))
+
 
 def estimate():
     return 1

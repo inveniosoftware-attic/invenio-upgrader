@@ -21,8 +21,10 @@ from invenio.legacy.dbquery import run_sql
 
 depends_on = ['invenio_release_1_1_0']
 
+
 def info():
     return "New bibedit cache (bibEDITCACHE) table"
+
 
 def do_upgrade():
     """ Implement your upgrades here  """
@@ -35,6 +37,7 @@ def do_upgrade():
   PRIMARY KEY (`id_bibrec`, `uid`),
   INDEX `post_date` (`post_date`)
 ) ENGINE=MyISAM""")
+
 
 def estimate():
     """  Estimate running time of upgrade in seconds (optional). """

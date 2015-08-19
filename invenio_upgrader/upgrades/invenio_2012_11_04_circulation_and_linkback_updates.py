@@ -23,24 +23,26 @@ from invenio.utils.text import wait_for_user
 
 depends_on = ['invenio_release_1_1_0']
 
+
 def info():
     return "WebLinkback and BibCirculation updates"
 
+
 def do_upgrade():
 
-    ## Since Invenio Upgrader was committed to maint-1.1 and merged to
-    ## master in 8d7ed84, some of the tables that were different in
-    ## maint-1.1 and master at the time needed upgrade recipe.  This
-    ## commit fixes the situation in gentle manner (by checking column
-    ## existence etc), since some sites may have upgraded DB schema in
-    ## various times.
+    # Since Invenio Upgrader was committed to maint-1.1 and merged to
+    # master in 8d7ed84, some of the tables that were different in
+    # maint-1.1 and master at the time needed upgrade recipe.  This
+    # commit fixes the situation in gentle manner (by checking column
+    # existence etc), since some sites may have upgraded DB schema in
+    # various times.
 
-    ## Firstly, BibCirculation tables:
+    # Firstly, BibCirculation tables:
 
     # crcBORROWER
     create_statement = run_sql('SHOW CREATE TABLE crcBORROWER')[0][1]
     if '`ccid` int(15)' not in create_statement:
-        run_sql("ALTER TABLE crcBORROWER ADD COLUMN ccid int(15) " \
+        run_sql("ALTER TABLE crcBORROWER ADD COLUMN ccid int(15) "
                 "unsigned NULL default NULL AFTER id")
     if 'KEY `ccid`' not in create_statement:
         run_sql("ALTER TABLE crcBORROWER ADD UNIQUE KEY ccid (ccid)")
@@ -52,16 +54,17 @@ def do_upgrade():
     # crcILLREQUEST
     create_statement = run_sql('SHOW CREATE TABLE crcILLREQUEST')[0][1]
     if '`budget_code` varchar(60)' not in create_statement:
-        run_sql("ALTER TABLE crcILLREQUEST ADD COLUMN budget_code varchar(60) " \
+        run_sql("ALTER TABLE crcILLREQUEST ADD COLUMN budget_code varchar(60) "
                 "NOT NULL default '' AFTER cost")
 
     # crcITEM.expected_arrival_date
     create_statement = run_sql('SHOW CREATE TABLE crcITEM')[0][1]
     if '`expected_arrival_date` varchar(60)' not in create_statement:
-        run_sql("ALTER TABLE crcITEM ADD COLUMN expected_arrival_date varchar(60) " \
-                "NOT NULL default '' AFTER status")
+        run_sql(
+            "ALTER TABLE crcITEM ADD COLUMN expected_arrival_date varchar(60) "
+            "NOT NULL default '' AFTER status")
 
-    ## Secondly, WebLinkback tables:
+    # Secondly, WebLinkback tables:
 
     run_sql("""
 CREATE TABLE IF NOT EXISTS lnkENTRY (
@@ -136,11 +139,14 @@ CREATE TABLE IF NOT EXISTS lnkADMINURLLOG (
 ) ENGINE=MyISAM;
 """)
 
+
 def estimate():
     return 10
 
+
 def pre_upgrade():
     pass
+
 
 def post_upgrade():
     pass

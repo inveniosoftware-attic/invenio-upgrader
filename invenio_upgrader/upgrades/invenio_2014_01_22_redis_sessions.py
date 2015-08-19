@@ -19,17 +19,22 @@
 
 depends_on = ['invenio_release_1_1_0']
 
+
 def info():
     return "Notice user about new redis sessions backend"
+
 
 def estimate():
     return 10
 
+
 def do_upgrade():
     pass
 
+
 def pre_upgrade():
     pass
+
 
 def post_upgrade():
     print 'NOTE: Please install redis server'

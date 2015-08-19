@@ -23,6 +23,7 @@ from invenio.legacy.dbquery import run_sql
 
 depends_on = ['invenio_2013_10_18_new_index_filetype']
 
+
 def info():
     return "New index filename."
 
@@ -88,11 +89,14 @@ def do_upgrade_atlantis():
     run_sql("""INSERT INTO field VALUES (43,'file name', 'filename')""")
     run_sql("""INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (28,43)""")
 
+
 def estimate():
     return 1
 
+
 def pre_upgrade():
     pass
+
 
 def post_upgrade():
     pass

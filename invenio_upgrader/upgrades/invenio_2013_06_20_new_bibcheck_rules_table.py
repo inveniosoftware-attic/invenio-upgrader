@@ -21,8 +21,10 @@ from invenio.legacy.dbquery import run_sql
 
 depends_on = ['invenio_release_1_1_0']
 
+
 def info():
     return "New bibcheck_rules table"
+
 
 def do_upgrade():
     run_sql("""
@@ -33,7 +35,7 @@ CREATE TABLE IF NOT EXISTS bibcheck_rules (
 ) ENGINE=MyISAM;
 """)
 
+
 def estimate():
     """  Estimate running time of upgrade in seconds (optional). """
     return 1
-

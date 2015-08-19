@@ -21,19 +21,24 @@ from invenio.legacy.dbquery import run_sql
 
 depends_on = ['invenio_2013_09_25_virtual_indexes']
 
+
 def info():
     return "Small compatibility change in idxINDEX table"
+
 
 def do_upgrade():
     res = run_sql("SELECT DISTINCT(id_virtual) FROM idxINDEX_idxINDEX")
     for row in res:
         run_sql("UPDATE idxINDEX SET indexer='virtual' WHERE id=%s", (row[0],))
 
+
 def estimate():
     return 1
 
+
 def pre_upgrade():
     pass
+
 
 def post_upgrade():
     pass

@@ -21,17 +21,23 @@ from invenio.legacy.dbquery import run_sql
 
 depends_on = ['invenio_release_1_1_0']
 
+
 def info():
     return "Lowering user.email values"
+
 
 def do_upgrade():
     run_sql("UPDATE user SET email=LOWER(email) WHERE email<>''")
 
+
 def estimate():
-    return run_sql("SELECT COUNT(email) FROM user WHERE email<>''")[0][0] / 1000 + 1
+    return run_sql("SELECT COUNT(email) FROM user WHERE email<>''")[
+        0][0] / 1000 + 1
+
 
 def pre_upgrade():
     pass
+
 
 def post_upgrade():
     pass

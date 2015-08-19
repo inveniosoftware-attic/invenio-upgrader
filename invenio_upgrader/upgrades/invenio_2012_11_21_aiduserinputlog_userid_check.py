@@ -21,8 +21,10 @@ from invenio.legacy.dbquery import run_sql
 
 depends_on = ['invenio_release_1_1_0']
 
+
 def info():
     return "Check existence of aidUSERINPUTLOG.userid column"
+
 
 def do_upgrade():
     """
@@ -39,4 +41,3 @@ def do_upgrade():
         run_sql("ALTER TABLE aidUSERINPUTLOG ADD COLUMN userid int AFTER timestamp;")
     if 'userid-b' not in indexes:
         run_sql("ALTER TABLE aidUSERINPUTLOG ADD KEY `userid-b` (userid)")
-

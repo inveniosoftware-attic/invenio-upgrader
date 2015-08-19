@@ -21,19 +21,24 @@ from invenio.legacy.dbquery import run_sql
 
 depends_on = ['invenio_release_1_1_0']
 
+
 def info():
     return "New idxINDEX.indexer column"
+
 
 def do_upgrade():
     create_statement = run_sql('SHOW CREATE TABLE idxINDEX')[0][1]
     if '`indexer` varchar(10)' not in create_statement:
         run_sql("ALTER TABLE idxINDEX ADD COLUMN indexer varchar(10) NOT NULL default 'native' AFTER stemming_language;")
 
+
 def estimate():
     return 1
 
+
 def pre_upgrade():
     pass
+
 
 def post_upgrade():
     pass

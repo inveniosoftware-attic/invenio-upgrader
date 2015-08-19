@@ -38,10 +38,11 @@ def do_upgrade():
 
 def estimate():
     """  Estimate running time of upgrade in seconds (optional). """
-    count_rows = run_sql("SELECT SUM(TABLE_ROWS) FROM INFORMATION_SCHEMA.TABLES "
-                         "WHERE TABLE_SCHEMA = '%s' "
-                         "AND (TABLE_NAME like 'idx%%R' or TABLE_NAME like 'rnk%%R')"
-                         % (CFG_DATABASE_NAME,))[0][0]
+    count_rows = run_sql(
+        "SELECT SUM(TABLE_ROWS) FROM INFORMATION_SCHEMA.TABLES "
+        "WHERE TABLE_SCHEMA = '%s' "
+        "AND (TABLE_NAME like 'idx%%R' or TABLE_NAME like 'rnk%%R')" %
+        (CFG_DATABASE_NAME,))[0][0]
     return count_rows / 1000
 
 

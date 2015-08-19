@@ -24,21 +24,22 @@ from invenio.legacy.dbquery import run_sql
 
 depends_on = ['invenio_2013_03_21_idxINDEX_stopwords']
 
+
 def info():
     return "Introduces new columns for idxINDEX table: remove_html_markup, remove_latex_markup"
 
 
 def do_upgrade():
-    #first step: change tables
+    # first step: change tables
     stmt = run_sql('SHOW CREATE TABLE idxINDEX')[0][1]
     if '`remove_html_markup` varchar(10)' not in stmt:
         run_sql("ALTER TABLE idxINDEX ADD COLUMN remove_html_markup varchar(10) NOT NULL default '' AFTER remove_stopwords")
     if '`remove_latex_markup` varchar(10)' not in stmt:
         run_sql("ALTER TABLE idxINDEX ADD COLUMN remove_latex_markup varchar(10) NOT NULL default '' AFTER remove_html_markup")
-    #second step: fill tables
+    # second step: fill tables
     run_sql("UPDATE idxINDEX SET remove_html_markup='No'")
     run_sql("UPDATE idxINDEX SET remove_latex_markup='No'")
-    #third step: check invenio.conf and update db if necessary
+    # third step: check invenio.conf and update db if necessary
     try:
         from invenio.config import CFG_BIBINDEX_REMOVE_HTML_MARKUP, CFG_BIBINDEX_REMOVE_LATEX_MARKUP
         if CFG_BIBINDEX_REMOVE_HTML_MARKUP:
@@ -50,11 +51,14 @@ def do_upgrade():
     except:
         pass
 
+
 def estimate():
     return 1
 
+
 def pre_upgrade():
     pass
+
 
 def post_upgrade():
     print('NOTE: please double check your new HTML/LaTeX processing settings in BibIndex Admin Interface.')

@@ -23,23 +23,27 @@ from invenio.utils.text import wait_for_user
 
 depends_on = ['invenio_release_1_1_0']
 
+
 def info():
     return "New crcILLREQUEST overdue letter columns"
+
 
 def do_upgrade():
     stmt = run_sql('SHOW CREATE TABLE crcILLREQUEST')[0][1]
     if '`overdue_letter_number` int(3)' not in stmt:
-        run_sql("ALTER TABLE crcILLREQUEST ADD COLUMN overdue_letter_number int(3) unsigned NOT NULL default '0'")
+        run_sql(
+            "ALTER TABLE crcILLREQUEST ADD COLUMN overdue_letter_number int(3) unsigned NOT NULL default '0'")
     if '`overdue_letter_date` datetime' not in stmt:
         run_sql("ALTER TABLE crcILLREQUEST ADD COLUMN overdue_letter_date datetime NOT NULL default '0000-00-00 00:00:00'")
- 
+
 
 def estimate():
     return 1
 
+
 def pre_upgrade():
     pass
 
+
 def post_upgrade():
     pass
-

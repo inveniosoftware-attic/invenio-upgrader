@@ -22,16 +22,17 @@ from invenio.legacy.dbquery import run_sql
 
 depends_on = ['invenio_2013_03_25_idxINDEX_html_markup']
 
+
 def info():
     return "Introduces new columns for idxINDEX table: tokenizer"
 
 
 def do_upgrade():
-    #first step: change table
+    # first step: change table
     stmt = run_sql('SHOW CREATE TABLE idxINDEX')[0][1]
     if '`tokenizer` varchar(50)' not in stmt:
         run_sql("ALTER TABLE idxINDEX ADD COLUMN tokenizer varchar(50) NOT NULL default '' AFTER remove_latex_markup")
-    #second step: update table
+    # second step: update table
     run_sql("""UPDATE idxINDEX SET tokenizer='BibIndexDefaultTokenizer' WHERE name IN
                             ('global', 'collection', 'abstract', 'keyword',
                              'reference', 'reportnumber', 'title', 'collaboration',
@@ -43,15 +44,18 @@ def do_upgrade():
     run_sql("""UPDATE idxINDEX SET tokenizer='BibIndexFulltextTokenizer' WHERE name='fulltext'""")
     run_sql("""UPDATE idxINDEX SET tokenizer='BibIndexAuthorCountTokenizer' WHERE name='authorcount'""")
     run_sql("""UPDATE idxINDEX SET tokenizer='BibIndexJournalTokenizer' WHERE name='journal'""")
-    run_sql("""UPDATE idxINDEX SET tokenizer='BibIndexYearTokenizer' WHERE name='year'""")
+    run_sql(
+        """UPDATE idxINDEX SET tokenizer='BibIndexYearTokenizer' WHERE name='year'""")
     run_sql("""UPDATE idxINDEX SET tokenizer='BibIndexDefaultTokenizer' WHERE tokenizer = ''""")
 
 
 def estimate():
     return 1
 
+
 def pre_upgrade():
     pass
+
 
 def post_upgrade():
     pass

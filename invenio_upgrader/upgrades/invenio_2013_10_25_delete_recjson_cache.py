@@ -23,17 +23,22 @@ from invenio.legacy.dbquery import run_sql
 
 depends_on = ['invenio_release_1_1_0']
 
+
 def info():
     return "Delete recjson cache after bibfield config update"
+
 
 def do_upgrade():
     run_sql("DELETE FROM bibfmt WHERE format='recjson'")
 
+
 def estimate():
     return 10
 
+
 def pre_upgrade():
     pass
+
 
 def post_upgrade():
     print('NOTE: please run inveniocfg --load-bibfield-conf to apply new changes.')

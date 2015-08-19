@@ -24,13 +24,14 @@ from invenio.legacy.dbquery import run_sql
 
 depends_on = ['invenio_2013_03_28_idxINDEX_tokenizer']
 
+
 def info():
     return "Updates column remove_stopwords of idxINDEX table with path to default 'stopwords' file if necessary"
 
 
 def do_upgrade():
-    #different stopwords file for every index:
-    #need to update default stopwords path for every index
+    # different stopwords file for every index:
+    # need to update default stopwords path for every index
     from invenio.config import CFG_BIBINDEX_REMOVE_STOPWORDS
     if CFG_BIBINDEX_REMOVE_STOPWORDS:
         if CFG_BIBINDEX_REMOVE_STOPWORDS == 1:
@@ -40,8 +41,10 @@ def do_upgrade():
 def estimate():
     return 1
 
+
 def pre_upgrade():
     pass
+
 
 def post_upgrade():
     print('NOTE: please double check your new index stopword settings in BibIndex Admin Interface.')

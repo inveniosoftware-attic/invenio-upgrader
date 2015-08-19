@@ -24,8 +24,10 @@ from invenio.legacy.dbquery import run_sql
 depends_on = ['invenio_2013_08_22_new_index_itemcount',
               'invenio_2013_08_22_hstRECORD_affected_fields']
 
+
 def info():
     return "BibIndex virtual indexes"
+
 
 def do_upgrade():
     run_sql("""CREATE TABLE IF NOT EXISTS idxINDEX_idxINDEX (
@@ -34,11 +36,12 @@ def do_upgrade():
                  PRIMARY KEY (id_virtual,id_normal)
                ) ENGINE=MyISAM""")
 
+
 def do_upgrade_atlantis():
-    #0 step: parametrize script for quick change
+    # 0 step: parametrize script for quick change
     misc_field = 39
     misc_index = 26
-    #1st step: create tables for miscellaneous index
+    # 1st step: create tables for miscellaneous index
     run_sql("""CREATE TABLE IF NOT EXISTS idxWORD%02dF (
                  id mediumint(9) unsigned NOT NULL auto_increment,
                  term varchar(50) default NULL,
@@ -79,16 +82,20 @@ def do_upgrade_atlantis():
                  PRIMARY KEY (id_bibrec,type)
                ) ENGINE=MyISAM""" % misc_index)
 
-    #2nd step: add 'miscellaneous' index to idxINDEX table
+    # 2nd step: add 'miscellaneous' index to idxINDEX table
     run_sql("""INSERT INTO idxINDEX VALUES (%s,'miscellaneous','This index contains words/phrases from miscellaneous fields','0000-00-00 00:00:00', '', 'native','','No','No','No', 'BibIndexDefaultTokenizer')""" % misc_index)
 
-    #3rd step: add 'miscellaneous' field
-    run_sql("""INSERT INTO field VALUES (%s,'miscellaneous', 'miscellaneous')""" % misc_field)
+    # 3rd step: add 'miscellaneous' field
+    run_sql(
+        """INSERT INTO field VALUES (%s,'miscellaneous', 'miscellaneous')""" %
+        misc_field)
 
-    #4th step: add idxINDEX_field map
-    run_sql("""INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (%s,%s)""" % (misc_index, misc_field))
+    # 4th step: add idxINDEX_field map
+    run_sql(
+        """INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (%s,%s)""" %
+        (misc_index, misc_field))
 
-    #5th step: add tags
+    # 5th step: add tags
     run_sql("""INSERT INTO tag VALUES (157,'031x','031%')""")
     run_sql("""INSERT INTO tag VALUES (158,'032x','032%')""")
     run_sql("""INSERT INTO tag VALUES (159,'033x','033%')""")
@@ -152,10 +159,11 @@ def do_upgrade_atlantis():
     run_sql("""INSERT INTO tag VALUES (217,'institution control','110__0')""")
     run_sql("""INSERT INTO tag VALUES (218,'journal control','130__0')""")
     run_sql("""INSERT INTO tag VALUES (219,'subject control','150__0')""")
-    run_sql("""INSERT INTO tag VALUES (220,'additional institution control', '260__0')""")
+    run_sql(
+        """INSERT INTO tag VALUES (220,'additional institution control', '260__0')""")
     run_sql("""INSERT INTO tag VALUES (221,'additional author control', '700__0')""")
 
-    #6th step: add field tag mapping
+    # 6th step: add field tag mapping
     run_sql("""INSERT INTO field_tag VALUES (%s,17,10)""" % misc_field)
     run_sql("""INSERT INTO field_tag VALUES (%s,18,10)""" % misc_field)
     run_sql("""INSERT INTO field_tag VALUES (%s,157,10)""" % misc_field)
@@ -320,30 +328,54 @@ def do_upgrade_atlantis():
     run_sql("""INSERT INTO field_tag VALUES (%s,220,10)""" % misc_field)
     run_sql("""INSERT INTO field_tag VALUES (%s,221,10)""" % misc_field)
 
-    #7th step: remove old unneeded field tag mapping
+    # 7th step: remove old unneeded field tag mapping
     run_sql("""DELETE FROM field_tag WHERE id_field=1""")
 
-    #8th step: add mapping between indexes for global index
+    # 8th step: add mapping between indexes for global index
     query = """SELECT name, id FROM idxINDEX"""
     ids = dict(run_sql(query))
-    run_sql("""INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (%s, %s)""" % (ids['global'], ids['collection']))
-    run_sql("""INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (%s, %s)""" % (ids['global'], ids['abstract']))
-    run_sql("""INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (%s, %s)""" % (ids['global'], ids['collection']))
-    run_sql("""INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (%s, %s)""" % (ids['global'], ids['reportnumber']))
-    run_sql("""INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (%s, %s)""" % (ids['global'], ids['title']))
-    run_sql("""INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (%s, %s)""" % (ids['global'], ids['year']))
-    run_sql("""INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (%s, %s)""" % (ids['global'], ids['journal']))
-    run_sql("""INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (%s, %s)""" % (ids['global'], ids['collaboration']))
-    run_sql("""INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (%s, %s)""" % (ids['global'], ids['affiliation']))
-    run_sql("""INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (%s, %s)""" % (ids['global'], ids['exacttitle']))
-    run_sql("""INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (%s, %s)""" % (ids['global'], ids['miscellaneous']))
+    run_sql(
+        """INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (%s, %s)""" %
+        (ids['global'], ids['collection']))
+    run_sql(
+        """INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (%s, %s)""" %
+        (ids['global'], ids['abstract']))
+    run_sql(
+        """INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (%s, %s)""" %
+        (ids['global'], ids['collection']))
+    run_sql(
+        """INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (%s, %s)""" %
+        (ids['global'], ids['reportnumber']))
+    run_sql(
+        """INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (%s, %s)""" %
+        (ids['global'], ids['title']))
+    run_sql(
+        """INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (%s, %s)""" %
+        (ids['global'], ids['year']))
+    run_sql(
+        """INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (%s, %s)""" %
+        (ids['global'], ids['journal']))
+    run_sql(
+        """INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (%s, %s)""" %
+        (ids['global'], ids['collaboration']))
+    run_sql(
+        """INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (%s, %s)""" %
+        (ids['global'], ids['affiliation']))
+    run_sql(
+        """INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (%s, %s)""" %
+        (ids['global'], ids['exacttitle']))
+    run_sql(
+        """INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (%s, %s)""" %
+        (ids['global'], ids['miscellaneous']))
 
 
 def estimate():
     return 1
 
+
 def pre_upgrade():
     pass
+
 
 def post_upgrade():
     print('NOTE: please double check your index settings in BibIndex Admin Interface; you can make your global index virtual.')

@@ -21,14 +21,17 @@ from invenio.legacy.dbquery import run_sql
 
 depends_on = ['invenio_release_1_1_0']
 
+
 def info():
     return """Adds a new column to bibfmt for knowing when a second pass
               is required on the cached template"""
+
 
 def do_upgrade():
     create_statement = run_sql('SHOW CREATE TABLE bibfmt')[0][1]
     if 'needs_2nd_pass' not in create_statement:
         run_sql("ALTER TABLE bibfmt ADD COLUMN needs_2nd_pass TINYINT(1) DEFAULT 0")
+
 
 def estimate():
     """  Estimate running time of upgrade in seconds (optional). """

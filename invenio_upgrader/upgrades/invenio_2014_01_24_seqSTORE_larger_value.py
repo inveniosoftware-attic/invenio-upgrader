@@ -21,12 +21,15 @@ from invenio.legacy.dbquery import run_sql
 
 depends_on = ['invenio_2013_12_04_seqSTORE_larger_value']
 
+
 def info():
     return "Larger values allowed for seqSTORE.seq_value"
+
 
 def do_upgrade():
     """ Implement your upgrades here  """
     run_sql("ALTER TABLE seqSTORE MODIFY COLUMN seq_value varchar(255);")
+
 
 def estimate():
     """  Estimate running time of upgrade in seconds (optional). """

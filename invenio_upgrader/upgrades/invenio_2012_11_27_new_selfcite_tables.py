@@ -21,8 +21,10 @@ from invenio.legacy.dbquery import run_sql
 
 depends_on = ['invenio_release_1_1_0']
 
+
 def info():
     return "New selfcite tables"
+
 
 def do_upgrade():
     run_sql("""
@@ -47,6 +49,7 @@ def do_upgrade():
       `last_updated` datetime NOT NULL,
       PRIMARY KEY (`id_bibrec`)
     ) ENGINE=MyISAM""")
+
 
 def estimate():
     return 1

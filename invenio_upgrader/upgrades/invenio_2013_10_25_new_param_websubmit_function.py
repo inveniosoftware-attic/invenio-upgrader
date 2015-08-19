@@ -21,15 +21,20 @@ from invenio.legacy.dbquery import run_sql
 
 depends_on = ['invenio_release_1_1_0']
 
+
 def info():
     return "New 'directRelationshipMARC', 'reverseRelationshipMARC' and 'bibuploadMode', parameters for Link_Records WebSubmit function"
 
+
 def do_upgrade():
-    run_sql("""INSERT INTO sbmFUNDESC VALUES ('Link_Records','directRelationshipMARC')""")
-    run_sql("""INSERT INTO sbmFUNDESC VALUES ('Link_Records','reverseRelationshipMARC')""")
+    run_sql(
+        """INSERT INTO sbmFUNDESC VALUES ('Link_Records','directRelationshipMARC')""")
+    run_sql(
+        """INSERT INTO sbmFUNDESC VALUES ('Link_Records','reverseRelationshipMARC')""")
     run_sql("""INSERT INTO sbmFUNDESC VALUES ('Link_Records','bibuploadMode')""")
     run_sql("""INSERT INTO sbmFUNDESC VALUES ('Link_Records','silentFailures')""")
     run_sql("""INSERT INTO sbmFUNDESC VALUES ('Link_Records','considerEmpty')""")
+
 
 def estimate():
     """  Estimate running time of upgrade in seconds (optional). """

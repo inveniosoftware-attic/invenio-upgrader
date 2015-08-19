@@ -21,24 +21,30 @@ from invenio.legacy.dbquery import run_sql
 
 depends_on = ['invenio_2012_11_15_hstRECORD_marcxml_longblob']
 
+
 def info():
     return "New column hstRECORD.affected_fields"
 
+
 def do_upgrade():
-    #first step: change the table
+    # first step: change the table
     create_statement = run_sql('SHOW CREATE TABLE hstRECORD')[0][1]
     if 'affected_fields' not in create_statement:
-        run_sql("ALTER TABLE hstRECORD ADD COLUMN affected_fields text NOT NULL default '' AFTER job_details")
-    #second step: nothing
-    #we don't need to fill in the column since empty value
-    #is valid and it means that all fields/tags were modified
+        run_sql(
+            "ALTER TABLE hstRECORD ADD COLUMN affected_fields text NOT NULL default '' AFTER job_details")
+    # second step: nothing
+    # we don't need to fill in the column since empty value
+    # is valid and it means that all fields/tags were modified
+
 
 def estimate():
     """  Estimate running time of upgrade in seconds (optional). """
     return 1
 
+
 def pre_upgrade():
     pass
+
 
 def post_upgrade():
     """Check for potentially invalid revisions"""

@@ -23,13 +23,17 @@ from invenio.utils.text import wait_for_user
 
 depends_on = ['invenio_release_1_1_0']
 
+
 def info():
     return "Increase of wapCACHE.object_value storage to longblob"
 
+
 def do_upgrade():
-    object_value_type = run_sql("SHOW COLUMNS FROM `wapCACHE` LIKE 'object_value'")[0][1]
+    object_value_type = run_sql(
+        "SHOW COLUMNS FROM `wapCACHE` LIKE 'object_value'")[0][1]
     if object_value_type not in ['longblob', 'LONGBLOB']:
         run_sql("ALTER TABLE wapCACHE CHANGE object_value object_value longblob")
+
 
 def estimate():
     count_rows = run_sql("SELECT COUNT(*) FROM wapCACHE")[0][0]

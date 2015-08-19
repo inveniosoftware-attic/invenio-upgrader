@@ -21,8 +21,10 @@ from invenio.legacy.dbquery import run_sql
 
 depends_on = ['invenio_release_1_1_0']
 
+
 def info():
     return "New collectionboxname table"
+
 
 def do_upgrade():
     run_sql("""
@@ -34,6 +36,7 @@ CREATE TABLE IF NOT EXISTS collectionboxname (
   PRIMARY KEY  (id_collection,ln,type)
   ) ENGINE=MyISAM;
 """)
+
 
 def estimate():
     """  Estimate running time of upgrade in seconds (optional). """

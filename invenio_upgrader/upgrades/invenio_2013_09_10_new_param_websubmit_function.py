@@ -21,15 +21,21 @@ from invenio.legacy.dbquery import run_sql
 
 depends_on = ['invenio_release_1_1_0']
 
+
 def info():
     return "New 'prefix', 'suffix', 'button_label', 'button_prefix' and 'dates_conversion' parameters for Create_Modify_Interface WebSubmit function"
+
 
 def do_upgrade():
     run_sql("""INSERT INTO sbmFUNDESC VALUES ('Create_Modify_Interface','prefix')""")
     run_sql("""INSERT INTO sbmFUNDESC VALUES ('Create_Modify_Interface','suffix')""")
-    run_sql("""INSERT INTO sbmFUNDESC VALUES ('Create_Modify_Interface','button_label')""")
-    run_sql("""INSERT INTO sbmFUNDESC VALUES ('Create_Modify_Interface','button_prefix')""")
-    run_sql("""INSERT INTO sbmFUNDESC VALUES ('Create_Modify_Interface','dates_conversion')""")
+    run_sql(
+        """INSERT INTO sbmFUNDESC VALUES ('Create_Modify_Interface','button_label')""")
+    run_sql(
+        """INSERT INTO sbmFUNDESC VALUES ('Create_Modify_Interface','button_prefix')""")
+    run_sql(
+        """INSERT INTO sbmFUNDESC VALUES ('Create_Modify_Interface','dates_conversion')""")
+
 
 def estimate():
     """  Estimate running time of upgrade in seconds (optional). """

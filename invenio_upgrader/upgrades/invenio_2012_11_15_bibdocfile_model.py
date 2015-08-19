@@ -248,11 +248,11 @@ def _fix_recid(recid, logger):
                         if v1 != v2:
                             are_equal = False
                             logger.info(("ERROR: Document %s: Expected "
-                                        "description %s and got %s")
+                                         "description %s and got %s")
                                         % (str(docid), str(v2), str(v1)))
             except Exception as e:
                 logger.info(("ERROR: Document %s: Problem with retrieving "
-                            "descriptions: %s  MoreInfo: %s Descriptions: %s")
+                             "descriptions: %s  MoreInfo: %s Descriptions: %s")
                             % (str(docid), str(e), str(minfo),
                                str(descriptions)))
 

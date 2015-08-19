@@ -27,12 +27,16 @@ depends_on = ['invenio_release_1_1_0']
 def info():
     return "Update collection tree definition to match next structure"
 
+
 def pre_upgrade():
-    warnings.warn("Please check that you are upgrading from latest major release.")
+    warnings.warn(
+        "Please check that you are upgrading from latest major release.")
+
 
 def do_upgrade():
     """Change the score to the opposite order."""
     pass
+
 
 def estimate():
     return 1

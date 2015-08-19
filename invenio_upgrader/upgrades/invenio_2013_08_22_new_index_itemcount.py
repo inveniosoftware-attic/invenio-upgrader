@@ -21,6 +21,7 @@ from invenio.legacy.dbquery import run_sql
 
 depends_on = ['invenio_2013_08_20_bibauthority_updates']
 
+
 def info():
     return """Introduces new index: itemcount"""
 
@@ -30,7 +31,7 @@ def do_upgrade():
 
 
 def do_upgrade_atlantis():
-    #first step: create tables
+    # first step: create tables
     run_sql("""CREATE TABLE IF NOT EXISTS idxWORD24F (
                  id mediumint(9) unsigned NOT NULL auto_increment,
                  term varchar(50) default NULL,
@@ -59,7 +60,6 @@ def do_upgrade_atlantis():
                  PRIMARY KEY (id_bibrec,type)
                ) ENGINE=MyISAM;""")
 
-
     run_sql("""CREATE TABLE IF NOT EXISTS idxPHRASE24F (
                  id mediumint(9) unsigned NOT NULL auto_increment,
                  term text default NULL,
@@ -73,7 +73,7 @@ def do_upgrade_atlantis():
                  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
                  PRIMARY KEY (id_bibrec,type)
                ) ENGINE=MyISAM;""")
-    #second step: fill in idxINDEX, idxINDEX_field, field tables
+    # second step: fill in idxINDEX, idxINDEX_field, field tables
     run_sql("""INSERT INTO field VALUES (37,'item count','itemcount')""")
     run_sql("""INSERT INTO idxINDEX VALUES (24,'itemcount','This index contains number of copies of items in the library.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexItemCountTokenizer')""")
     run_sql("""INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (24,37)""")

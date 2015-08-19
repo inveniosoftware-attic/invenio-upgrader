@@ -30,25 +30,30 @@ def info():
 
 
 def do_upgrade():
-    #first step: change tables
+    # first step: change tables
     stmt = run_sql('SHOW CREATE TABLE idxINDEX')[0][1]
     if '`synonym_kbrs` varchar(255)' not in stmt:
-        run_sql("ALTER TABLE idxINDEX ADD COLUMN synonym_kbrs varchar(255) NOT NULL default '' AFTER indexer")
-    #second step: fill tables
+        run_sql(
+            "ALTER TABLE idxINDEX ADD COLUMN synonym_kbrs varchar(255) NOT NULL default '' AFTER indexer")
+    # second step: fill tables
     run_sql("UPDATE idxINDEX SET synonym_kbrs='INDEX-SYNONYM-TITLE,exact' WHERE name IN ('global','title')")
-    #third step: check invenio.conf
+    # third step: check invenio.conf
     from invenio.config import CFG_BIBINDEX_SYNONYM_KBRS
     if CFG_BIBINDEX_SYNONYM_KBRS:
         for index in CFG_BIBINDEX_SYNONYM_KBRS:
             synonym = ",".join(CFG_BIBINDEX_SYNONYM_KBRS[index])
-            query = "UPDATE idxINDEX SET synonym_kbrs='%s' WHERE name=%s" % (synonym, index)
+            query = "UPDATE idxINDEX SET synonym_kbrs='%s' WHERE name=%s" % (
+                synonym, index)
             run_sql(query)
+
 
 def estimate():
     return 1
 
+
 def pre_upgrade():
     pass
+
 
 def post_upgrade():
     print('NOTE: please double check your new index synonym settings in BibIndex Admin Interface.')

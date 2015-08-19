@@ -22,29 +22,35 @@ from invenio.legacy.dbquery import run_sql
 
 depends_on = ['invenio_release_1_1_0']
 
+
 def info():
     return "Increase of hstRECORD.marcxml storage to longblob"
+
 
 def do_upgrade():
     create_statement = run_sql('SHOW CREATE TABLE hstRECORD')[0][1]
     if '`marcxml` longblob' not in create_statement:
         run_sql("ALTER TABLE hstRECORD CHANGE marcxml marcxml longblob NOT NULL")
 
+
 def estimate():
     """  Estimate running time of upgrade in seconds (optional). """
     count_rows = run_sql("SELECT COUNT(*) FROM hstRECORD")[0][0]
     return count_rows / 20
 
+
 def pre_upgrade():
     pass
+
 
 def post_upgrade():
     """Check for potentially invalid revisions"""
     res = run_sql("""SELECT DISTINCT(id_bibrec) FROM hstRECORD
-                     WHERE CHAR_LENGTH(marcxml) =  %s""", [2**16-1])
+                     WHERE CHAR_LENGTH(marcxml) =  %s""", [2**16 - 1])
     if res:
-        warnings.warn("You have %s records with potentially corrupt history revisions!" % \
-                      len(res))
+        warnings.warn(
+            "You have %s records with potentially corrupt history revisions!" %
+            len(res))
         warnings.warn("You may want to run the following:")
         for row in res:
             warnings.warn("bibedit --fix-revisions %s" % row[0])
