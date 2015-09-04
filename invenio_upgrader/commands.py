@@ -132,10 +132,11 @@ def cmd_upgrade_check(upgrader=None):
 
 def cmd_upgrade(upgrader=None):
     """Command for applying upgrades."""
-    from invenio.config import CFG_LOGDIR
+    from flask import current_app
     from invenio.utils.text import wrap_text_in_a_box, wait_for_user
 
-    logfilename = os.path.join(CFG_LOGDIR, 'invenio_upgrader.log')
+    logfilename = os.path.join(current_app.config['CFG_LOGDIR'],
+                               'invenio_upgrader.log')
     if not upgrader:
         upgrader = InvenioUpgrader()
     logger = upgrader.get_logger(logfilename=logfilename)
