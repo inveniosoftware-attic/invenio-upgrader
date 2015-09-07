@@ -24,6 +24,10 @@
 Changes
 =======
 
+Version 0.1.1 (release 2015-09-07)
+
+- Replaces usage of invenio.config with flask current_app.config.
+
 Version 0.1.0 (release 2015-08-19)
 
 - Initial public release.
