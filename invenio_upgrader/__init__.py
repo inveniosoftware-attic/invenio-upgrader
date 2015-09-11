@@ -24,7 +24,7 @@ Usage (via ``inveniomanage``).
 .. code-block:: console
 
     $ inveniomanage upgrader create recipe -p invenio_search
-    $ inveniomanage upgrader create release -r invenio -p invenio.base
+    $ inveniomanage upgrader create release -r invenio -p invenio_base
     $ inveniomanage upgrader show applied
     $ inveniomanage upgrader show pending
     $ inveniomanage upgrader check
@@ -74,8 +74,8 @@ the graph and will refuse to run any upgrades until the cycles have been
 broken.
 """
 
-from invenio.base import signals
-from invenio.base.scripts.database import create, recreate
+from invenio_base import signals
+from invenio_base.scripts.database import create, recreate
 
 
 def populate_existing_upgrades(sender, yes_i_know=False, drop=True, **kwargs):
