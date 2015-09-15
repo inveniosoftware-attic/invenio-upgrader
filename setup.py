@@ -34,7 +34,7 @@ readme = open('README.rst').read()
 history = open('CHANGES.rst').read()
 
 requirements = [
-    'alembic>=0.6.6,<0.7',
+    'alembic>=0.7,<0.8',
     'Flask>=0.10.1',
     'six>=1.7.2',
     'invenio-base>=0.2.1',
