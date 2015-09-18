@@ -39,13 +39,15 @@ def do_upgrade():
     """Carry out the upgrade."""
     from flask import current_app
     if current_app.config.get('CFG_DATABASE_TYPE') == 'mysql':
-        run_sql(
-            "SELECT CONCAT('ALTER TABLE ',TABLE_NAME,' ENGINE=InnoDB;')"
+        table_names = run_sql(
+            "SELECT TABLE_NAME"
             " FROM INFORMATION_SCHEMA.TABLES"
             " WHERE ENGINE='MyISAM'"
-            " AND table_schema = %s",
+            " AND table_schema=%s",
             (current_app.config.get('CFG_DATABASE_NAME'),)
         )
+        for table_name in table_names:
+            run_sql("ALTER TABLE `%s` ENGINE=InnoDB" % (table_name[0],))
 
 
 def estimate():
