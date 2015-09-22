@@ -17,7 +17,7 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.ext.script import Manager
+from invenio_ext.script import Manager
 
 manager = Manager(usage="Perform upgrade engine operations.")
 

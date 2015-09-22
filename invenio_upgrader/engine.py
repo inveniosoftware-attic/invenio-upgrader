@@ -31,7 +31,7 @@ from flask import current_app
 from flask_registry import ImportPathRegistry, RegistryProxy
 from sqlalchemy import desc
 
-from invenio.ext.sqlalchemy import db
+from invenio_ext.sqlalchemy import db
 
 from .checks import post_check_bibsched
 from .logging import InvenioUpgraderLogFormatter
@@ -348,7 +348,7 @@ class InvenioUpgrader(object):
             be included, if False the entire upgrade graph will be
             returned.
         """
-        from invenio.ext.registry import ModuleAutoDiscoverySubRegistry
+        from invenio_ext.registry import ModuleAutoDiscoverySubRegistry
         from invenio.utils.autodiscovery import create_enhanced_plugin_builder
 
         if remove_applied:
