@@ -21,10 +21,9 @@
 
 from __future__ import print_function
 
-import sys
-
 from invenio_base.utils import run_py_func
-from invenio.testsuite import InvenioTestCase
+
+from invenio_testing import InvenioTestCase
 
 
 class UpgraderManageTest(InvenioTestCase):
