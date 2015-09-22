@@ -55,7 +55,7 @@ UPGRADE_TEMPLATE = """# -*- coding: utf-8 -*-
 
 import warnings
 
-from invenio.ext.sqlalchemy import db
+from invenio_ext.sqlalchemy import db
 from invenio_upgrader.api import op
 from invenio.utils.text import wait_for_user
 
@@ -345,7 +345,7 @@ def _write_template(upgrade_file, depends_on, repository, auto=False):
     """Write template to upgrade file."""
     if auto:
         # Ensure all models are loaded
-        from invenio.ext.sqlalchemy import models
+        from invenio_ext.sqlalchemy import models
         list(models)
         template_args = produce_upgrade_operations()
         operations_str = template_args['upgrades']
