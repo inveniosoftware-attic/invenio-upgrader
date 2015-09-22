@@ -349,7 +349,7 @@ class InvenioUpgrader(object):
             returned.
         """
         from invenio_ext.registry import ModuleAutoDiscoverySubRegistry
-        from invenio.utils.autodiscovery import create_enhanced_plugin_builder
+        from invenio_utils.autodiscovery import create_enhanced_plugin_builder
 
         if remove_applied:
             self.load_history()

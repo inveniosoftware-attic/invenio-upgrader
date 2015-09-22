@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013 CERN.
+# Copyright (C) 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -69,7 +69,7 @@ def pre_upgrade():
                          SELECT DISTINCT(changeset_id) FROM bibHOLDINGPEN
                          WHERE LENGTH(changeset_xml) =  65535""" % len(res))
 
-        from invenio.utils.text import wait_for_user
+        from invenio_utils.text import wait_for_user
         try:
             wait_for_user(
                 "\nThis upgrade will delete all the corrupted entries. A backup table bibHOLDINGPEN_backup will be created.\n")

@@ -57,7 +57,7 @@ import warnings
 
 from invenio_ext.sqlalchemy import db
 from invenio_upgrader.api import op
-from invenio.utils.text import wait_for_user
+from invenio_utils.text import wait_for_user
 
 from sqlalchemy import *
 
@@ -133,7 +133,7 @@ def cmd_upgrade_check(upgrader=None):
 def cmd_upgrade(upgrader=None):
     """Command for applying upgrades."""
     from flask import current_app
-    from invenio.utils.text import wrap_text_in_a_box, wait_for_user
+    from invenio_utils.text import wrap_text_in_a_box, wait_for_user
 
     logfilename = os.path.join(current_app.config['CFG_LOGDIR'],
                                'invenio_upgrader.log')

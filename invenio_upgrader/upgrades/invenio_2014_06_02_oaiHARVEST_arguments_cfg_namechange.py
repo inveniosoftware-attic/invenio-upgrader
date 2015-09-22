@@ -20,7 +20,7 @@
 """Upgrade recipe."""
 
 from invenio.legacy.dbquery import run_sql
-from invenio.utils.serializers import deserialize_via_marshal, \
+from invenio_utils.serializers import deserialize_via_marshal, \
     serialize_via_marshal
 
 depends_on = ['invenio_release_1_1_0']
