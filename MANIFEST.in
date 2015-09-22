@@ -2,6 +2,7 @@ include *.py
 include *.rst
 include *.txt
 include .editorconfig .dockerignore
+include .travis.invenio.cfg .travis.yml
 include LICENSE
 include babel.ini
 include pytest.ini

@@ -37,9 +37,9 @@ requirements = [
     'alembic>=0.7,<0.8',
     'Flask>=0.10.1',
     'six>=1.7.2',
-    'invenio-base>=0.2.1',
-    'invenio-ext>=0.1.0',
-    'invenio-utils>=0.1.0',
+    'invenio-base>=0.3.0',
+    'invenio-ext>=0.2.1',
+    'invenio-utils>=0.1.1',
 ]
 
 test_requirements = [
@@ -49,6 +49,7 @@ test_requirements = [
     'pytest-cov>=2.1.0',
     'pytest-pep8>=1.0.6',
     'coverage>=4.0.0',
+    'invenio-testing>=0.1.1',
 ]
 
 

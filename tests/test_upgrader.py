@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013 CERN.
+# Copyright (C) 2012, 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,17 +19,20 @@
 
 """ Test unit for the miscutil/lib/inveniocfg_upgrader module. """
 
-
-from datetime import date
 import os
 import os.path
+
 import shutil
+
 import sys
+
 import tempfile
 
-import six
+from datetime import date
 
-from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
+from invenio_testing import InvenioTestCase
+
+import six
 
 
 def dictify(ls, value=None):
@@ -183,6 +186,7 @@ class TestInvenioUpgraderOrdering(InvenioTestCase):
 
 
 class TestInvenioUpgraderRecipe(InvenioTestCase):
+
     def setUp(self):
         """
         Setup a test python package, to test upgrade recipe creation.
@@ -335,12 +339,3 @@ class TestInvenioUpgraderRecipe(InvenioTestCase):
         for u in upgrades:
             if u['id'] == 'invenio_release_x_y_z':
                 assert len(u['depends_on']) == 2
-
-
-TEST_SUITE = make_test_suite(
-    TestInvenioUpgraderOrdering,
-    TestInvenioUpgraderRecipe,
-)
-
-if __name__ == "__main__":
-    run_test_suite(TEST_SUITE)
