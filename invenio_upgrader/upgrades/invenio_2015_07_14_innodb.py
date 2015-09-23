@@ -17,9 +17,9 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Upgrades MySQL database to InnoDB."""
+"""Upgrade MySQL database to InnoDB."""
 
-from invenio.legacy.dbquery import run_sql
+from invenio_ext.sqlalchemy import db
 
 
 depends_on = [
@@ -32,22 +32,22 @@ depends_on = [
 
 def info():
     """Return upgrade recipe information."""
-    return "Upgrades MySQL database to InnoDB."
+    return __doc__
 
 
 def do_upgrade():
     """Carry out the upgrade."""
     from flask import current_app
     if current_app.config.get('CFG_DATABASE_TYPE') == 'mysql':
-        table_names = run_sql(
+        table_names = db.engine.execute(
             "SELECT TABLE_NAME"
             " FROM INFORMATION_SCHEMA.TABLES"
             " WHERE ENGINE='MyISAM'"
             " AND table_schema=%s",
             (current_app.config.get('CFG_DATABASE_NAME'),)
-        )
+        ).fetchall()
         for table_name in table_names:
-            run_sql("ALTER TABLE `%s` ENGINE=InnoDB" % (table_name[0],))
+            db.engine.execute("ALTER TABLE `%s` ENGINE=InnoDB" % (table_name[0],))
 
 
 def estimate():
