@@ -24,6 +24,22 @@
 Changes
 =======
 
+Version 0.1.2 (release 2015-09-23)
+
+- Removes dependencies to invenio.testsuite and replaces them with
+  invenio_testing.
+- Removes dependencies to invenio.utils and replaces them with
+  invenio_utils.
+- Removes dependencies to invenio.ext and replaces them with
+  invenio_ext.
+- Removes calls to PluginManager consider_setuptools_entrypoints()
+  removed in PyTest 2.8.0.
+- Runs the sql statement which actually changes the engine from MyISAM
+  to InnoDB.
+- Upgrades pinned alembic version to allow the usage of
+  `batch_alter_table` method.
+- Adds missing `invenio_base` dependency.
+
 Version 0.1.1 (release 2015-09-07)
 
 - Replaces usage of invenio.config with flask current_app.config.

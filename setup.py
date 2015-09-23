@@ -95,7 +95,7 @@ setup(
     version=version,
     description=__doc__,
     long_description=readme + '\n\n' + history,
-    keywords='invenio TODO',
+    keywords='invenio upgrade alembic',
     license='GPLv2',
     author='CERN',
     author_email='info@invenio-software.org',
@@ -112,7 +112,7 @@ setup(
             'Sphinx>=1.3',
             'sphinx_rtd_theme>=0.1.7'
         ],
-        'tests': test_requirements
+        'tests': test_requirements,
     },
     classifiers=[
         'Environment :: Web Environment',
