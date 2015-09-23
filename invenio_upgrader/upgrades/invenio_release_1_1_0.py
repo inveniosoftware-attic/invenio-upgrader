@@ -1,7 +1,7 @@
 #-*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2008, 2009, 2010, 2011, 2012 CERN.
+# Copyright (C) 2008, 2009, 2010, 2011, 2012, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -551,7 +551,7 @@ def pre_upgrade():
                       " between 1.0.x and 1.1.0")
 
         # Run import here, since we are on 1.0-1.1 we know the import will work
-        from invenio.utils.text import wait_for_user
+        from invenio_utils.text import wait_for_user
         try:
             wait_for_user("\nUPGRADING TO 1.1.0 FROM A DEVELOPMENT VERSION"
                           " WILL LEAD TO MANY WARNINGS! Please thoroughly"
