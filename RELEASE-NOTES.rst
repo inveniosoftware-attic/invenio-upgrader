@@ -1,8 +1,8 @@
 =========================
- Invenio-Upgrader v0.1.2
+ Invenio-Upgrader v0.2.0
 =========================
 
-Invenio-Upgrader v0.1.2 was released on September 23, 2015.
+Invenio-Upgrader v0.2.0 was released on October 5, 2015.
 
 About
 -----
@@ -11,32 +11,21 @@ Upgrader engine for Invenio modules.
 
 *This is an experimental developer preview release.*
 
-Bug fixes
----------
+Incompatible changes
+--------------------
 
-- Removes dependencies to invenio.testsuite and replaces them with
-  invenio_testing.
-- Removes dependencies to invenio.utils and replaces them with
-  invenio_utils.
-- Removes dependencies to invenio.ext and replaces them with
-  invenio_ext.
-- Removes calls to PluginManager consider_setuptools_entrypoints()
-  removed in PyTest 2.8.0.
-- Runs the sql statement which actually changes the engine from MyISAM
-  to InnoDB.
-- Upgrades pinned alembic version to allow the usage of
-  `batch_alter_table` method.
-- Adds missing `invenio_base` dependency.
+- Removes legacy upgrade recipes. You **MUST** upgrade to the latest
+  Invenio 2.1 before upgrading Invenio-Upgrader. (#14)
 
 Installation
 ------------
 
-   $ pip install invenio-upgrader==0.1.2
+   $ pip install invenio-upgrader==0.2.0
 
 Documentation
 -------------
 
-   http://invenio-upgrader.readthedocs.org/en/v0.1.2
+   http://invenio-upgrader.readthedocs.org/en/v0.2.0
 
 Happy hacking and thanks for flying Invenio-Upgrader.
 

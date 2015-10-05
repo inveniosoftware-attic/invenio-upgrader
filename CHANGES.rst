@@ -24,7 +24,17 @@
 Changes
 =======
 
+Version 0.2.0 (release 2015-10-05)
+----------------------------------
+
+Incompatible changes
+~~~~~~~~~~~~~~~~~~~~
+
+- Removes legacy upgrade recipes. You **MUST** upgrade to the latest
+  Invenio 2.1 before upgrading Invenio-Upgrader. (#14)
+
 Version 0.1.2 (release 2015-09-23)
+----------------------------------
 
 - Removes dependencies to invenio.testsuite and replaces them with
   invenio_testing.
@@ -41,9 +51,11 @@ Version 0.1.2 (release 2015-09-23)
 - Adds missing `invenio_base` dependency.
 
 Version 0.1.1 (release 2015-09-07)
+----------------------------------
 
 - Replaces usage of invenio.config with flask current_app.config.
 
 Version 0.1.0 (release 2015-08-19)
+----------------------------------
 
 - Initial public release.
