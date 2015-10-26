@@ -19,27 +19,26 @@
 
 """Upgrader engine."""
 
-from __future__ import absolute_import
+from __future__ import absolute_import, print_function
 
 import logging
 import re
+import six
 import sys
 import warnings
 from datetime import datetime
+from pkg_resources import iter_entry_points
 
 from flask import current_app
-from flask_registry import ImportPathRegistry, RegistryProxy
 from sqlalchemy import desc
 
-from invenio_ext.sqlalchemy import db
+from invenio_db import db
 
-from .checks import post_check_bibsched
 from .logging import InvenioUpgraderLogFormatter
 from .models import Upgrade
 
 
 class InvenioUpgrader(object):
-
     """Class responsible for loading, sorting and executing upgrades.
 
     A note on cross graph dependencies: An upgrade is uniquely identified
@@ -53,30 +52,22 @@ class InvenioUpgrader(object):
     CONSOLE_LOG_INFO_FMT = '>>> %(prefix)s%(message)s'
     CONSOLE_LOG_FMT = '>>> %(prefix)s%(levelname)s: %(message)s'
 
-    def __init__(self, packages=None, global_pre_upgrade=None,
-                 global_post_upgrade=None):
+    _upgrades = dict()
+
+    def __init__(self, global_pre_upgrade=None, global_post_upgrade=None):
         """Init.
 
-        @param global_pre_upgrade: List of callables. Each check will be
-            executed once per upgrade-batch run. Useful e.g. to check if
-            bibsched is running.
-        @param global_post_upgrade: List of callables. Each check will be
-            executed once per upgrade-batch run. Useful e.g. to tell users
-            to start bibsched again.
+        :param global_pre_upgrade: List of callables. Each check will be
+            executed once per upgrade-batch run.
+        :param global_post_upgrade: List of callables. Each check will be
+            executed once per upgrade-batch run.
         """
         self.upgrades = None
         self.history = {}
         self.ordered_history = []
 
         self.global_pre_upgrade = global_pre_upgrade or []
-        self.global_post_upgrade = global_post_upgrade or [
-            post_check_bibsched
-        ]
-        if packages is None:
-            self.packages = current_app.extensions['registry']['packages']
-        else:
-            self.packages = RegistryProxy(
-                'upgrader.packages', ImportPathRegistry, initial=packages)
+        self.global_post_upgrade = global_post_upgrade or []
 
         # Warning related
         self.old_showwarning = None
@@ -93,20 +84,17 @@ class InvenioUpgrader(object):
         If an upgrades does not specify and estimate it is assumed to be
         in the order of 1 second.
 
-        @param upgrades: List of upgrades sorted in topological order.
+        :param upgrades: List of upgrades sorted in topological order.
         """
         val = 0
         for u in upgrades:
-            if 'estimate' in u:
-                val += u['estimate']()
-            else:
-                val += 1
+            val += u.estimate()
         return val
 
     def human_estimate(self, upgrades):
         """Make a human readable estimated time to completion string.
 
-        @param upgrades: List of upgrades sorted in topological order.
+        :param upgrades: List of upgrades sorted in topological order.
         """
         val = self.estimate(upgrades)
         if val < 60:
@@ -197,7 +185,7 @@ class InvenioUpgrader(object):
         All pre-checks will be executed even if one fails, however if one pre-
         check fails, the upgrade process will be stopped and the user warned.
 
-        @param upgrades: List of upgrades sorted in topological order.
+        :param upgrades: List of upgrades sorted in topological order.
         """
         errors = []
 
@@ -209,12 +197,11 @@ class InvenioUpgrader(object):
                 errors.append((check.__name__, e.args))
 
         for u in upgrades:
-            if 'pre_upgrade' in u:
-                self._setup_log_prefix(plugin_id=u['id'])
-                try:
-                    u['pre_upgrade']()
-                except RuntimeError as e:
-                    errors.append((u['id'], e.args))
+            self._setup_log_prefix(plugin_id=u.name)
+            try:
+                u.pre_upgrade()
+            except RuntimeError as e:
+                errors.append((u.name, e.args))
 
         self._teardown_log_prefix()
 
@@ -224,8 +211,8 @@ class InvenioUpgrader(object):
     def _check_errors(self, errors, prefix):
         """Check for errors and possible raise and format an error message.
 
-        @param errors: List of error messages.
-        @param prefix: str, Prefix message for error messages
+        :param errors: List of error messages.
+        :param prefix: str, Prefix message for error messages
         """
         args = []
 
@@ -251,17 +238,16 @@ class InvenioUpgrader(object):
 
         All applied upgrades post-checks are executed.
 
-        @param upgrades: List of upgrades sorted in topological order.
+        :param upgrades: List of upgrades sorted in topological order.
         """
         errors = []
 
         for u in upgrades:
-            if 'post_upgrade' in u:
-                self._setup_log_prefix(plugin_id=u['id'])
-                try:
-                    u['post_upgrade']()
-                except RuntimeError as e:
-                    errors.append((u['id'], e.args))
+            self._setup_log_prefix(plugin_id=u.name)
+            try:
+                u.post_upgrade()
+            except RuntimeError as e:
+                errors.append((u.name, e.args))
 
         for check in self.global_post_upgrade:
             self._setup_log_prefix(plugin_id=check.__name__)
@@ -280,13 +266,13 @@ class InvenioUpgrader(object):
 
         A upgrade may throw a RuntimeError, if an unrecoverable error happens.
 
-        @param upgrade: A single upgrade
+        :param upgrade: A single upgrade
         """
-        self._setup_log_prefix(plugin_id=upgrade['id'])
+        self._setup_log_prefix(plugin_id=upgrade.name)
 
         try:  # Nested due to Python 2.4
             try:
-                upgrade['do_upgrade']()
+                upgrade.do_upgrade()
                 self.register_success(upgrade)
             except RuntimeError as e:
                 msg = ["Upgrade error(s):"]
@@ -327,7 +313,7 @@ class InvenioUpgrader(object):
 
     def register_success(self, upgrade):
         """Register a successful upgrade."""
-        u = Upgrade(upgrade=upgrade['id'], applied=datetime.now())
+        u = Upgrade(upgrade=upgrade.name, applied=datetime.now())
         db.session.add(u)
         db.session.commit()
 
@@ -339,50 +325,146 @@ class InvenioUpgrader(object):
     def _load_upgrades(self, remove_applied=True):
         """Load upgrade modules.
 
-        Upgrade modules are loaded using pluginutils. The pluginutils module
-        is either loaded from site-packages via normal or via a user-loaded
-        module supplied in the __init__ method. This is useful when the engine
-        is running before actually being installed into site-packages.
-
-        @param remove_applied: if True, already applied upgrades will not
+        :param remove_applied: if True, already applied upgrades will not
             be included, if False the entire upgrade graph will be
             returned.
         """
-        from invenio_ext.registry import ModuleAutoDiscoverySubRegistry
-        from invenio_utils.autodiscovery import create_enhanced_plugin_builder
-
         if remove_applied:
             self.load_history()
 
-        plugin_builder = create_enhanced_plugin_builder(
-            compulsory_objects={
-                'do_upgrade': dummy_signgature,
-                'info': dummy_signgature,
-            },
-            optional_objects={
-                'estimate': dummy_signgature,
-                'pre_upgrade': dummy_signgature,
-                'post_upgrade': dummy_signgature,
-            },
-            other_data={
-                'depends_on': (list, []),
-            },
-        )
+        for entry_point in iter_entry_points('invenio_upgrader.upgrades'):
+            upgrade = entry_point.load()()
+            self.__class__._upgrades[upgrade.name] = upgrade
 
-        def builder(plugin):
-            plugin_id = plugin.__name__.split('.')[-1]
-            data = plugin_builder(plugin)
-            data['id'] = plugin_id
-            data['repository'] = self._parse_plugin_id(plugin_id)
-            return plugin_id, data
-        # Load all upgrades from installed packages
-        plugins = dict(map(
-            builder,
-            ModuleAutoDiscoverySubRegistry(
-                'upgrades', registry_namespace=self.packages
-            )))
+        return self.__class__._upgrades
 
-        return plugins
+    def get_upgrades(self, remove_applied=True):
+        """Get upgrades (ordered according to their dependencies).
+
+        :param remove_applied: Set to false to return all upgrades, otherwise
+            already applied upgrades are removed from their graph (incl. all
+            their dependencies.
+        """
+        if self.upgrades is None:
+            plugins = self._load_upgrades(remove_applied=remove_applied)
+
+            # List of un-applied upgrades in topological order
+            self.upgrades = self.order_upgrades(plugins, self.history)
+        return self.upgrades
+
+    def _create_graph(self, upgrades, history=None):
+        """Create dependency graph from upgrades.
+
+        :param upgrades: Dict of upgrades
+        :param history: Dict of applied upgrades
+        """
+        history = history or {}
+        graph_incoming = {}  # nodes their incoming edges
+        graph_outgoing = {}  # nodes their outgoing edges
+
+        # Create graph data structure
+        for mod in six.itervalues(upgrades):
+            # Remove all incoming edges from already applied upgrades
+            graph_incoming[mod.name] = [x for x in mod.depends_on
+                                        if x not in history]
+            # Build graph_outgoing
+            if mod.name not in graph_outgoing:
+                graph_outgoing[mod.name] = []
+            for edge in graph_incoming[mod.name]:
+                if edge not in graph_outgoing:
+                    graph_outgoing[edge] = []
+                graph_outgoing[edge].append(mod.name)
+
+        return (graph_incoming, graph_outgoing)
+
+    def find_endpoints(self):
+        """Find upgrade end-points (i.e nodes without dependents)."""
+        plugins = self._load_upgrades(remove_applied=False)
+
+        dummy_graph_incoming, graph_outgoing = self._create_graph(plugins, {})
+
+        endpoints = {}
+        for node, outgoing in six.iteritems(graph_outgoing):
+            if not outgoing:
+                repository = plugins[node].repository
+                if repository not in endpoints:
+                    endpoints[repository] = []
+                endpoints[repository].append(node)
+
+        return endpoints
+
+    def order_upgrades(self, upgrades, history=None):
+        """Order upgrades according to their dependencies.
+
+        (topological sort using
+        Kahn's algorithm - http://en.wikipedia.org/wiki/Topological_sorting).
+
+        :param upgrades: Dict of upgrades
+        :param history: Dict of applied upgrades
+        """
+        history = history or {}
+        graph_incoming, graph_outgoing = self._create_graph(upgrades, history)
+
+        # Removed already applied upgrades (assumes all dependencies prior to
+        # this upgrade has been applied).
+        for node_id in six.iterkeys(history):
+            start_nodes = [node_id, ]
+            while start_nodes:
+                node = start_nodes.pop()
+                # Remove from direct dependents
+                try:
+                    for d in graph_outgoing[node]:
+                        graph_incoming[d] = [x for x in graph_incoming[d]
+                                             if x != node]
+                except KeyError:
+                    warnings.warn("Ghost upgrade %s detected" % node)
+
+                # Remove all prior dependencies
+                if node in graph_incoming:
+                    # Get dependencies, remove node, and recursively
+                    # remove all dependencies.
+                    depends_on = graph_incoming[node]
+
+                    # Add dependencies to check
+                    for d in depends_on:
+                        graph_outgoing[d] = [x for x in graph_outgoing[d]
+                                             if x != node]
+                        start_nodes.append(d)
+
+                    del graph_incoming[node]
+
+        # Check for missing dependencies
+        for node_id, depends_on in six.iteritems(graph_incoming):
+            for d in depends_on:
+                if d not in graph_incoming:
+                    raise RuntimeError("Upgrade %s depends on an unknown"
+                                       " upgrade %s" % (node_id, d))
+
+        # Nodes with no incoming edges
+        start_nodes = [x for x in six.iterkeys(graph_incoming)
+                       if len(graph_incoming[x]) == 0]
+        topo_order = []
+
+        while start_nodes:
+            # Append node_n to list (it has no incoming edges)
+            node_n = start_nodes.pop()
+            topo_order.append(node_n)
+
+            # For each node m with and edge from n to m
+            for node_m in graph_outgoing[node_n]:
+                # Remove the edge n to m
+                graph_incoming[node_m] = [x for x in graph_incoming[node_m]
+                                          if x != node_n]
+                # If m has no incoming edges, add it to start_nodes.
+                if not graph_incoming[node_m]:
+                    start_nodes.append(node_m)
+
+        for node, edges in six.iteritems(graph_incoming):
+            if edges:
+                raise RuntimeError("The upgrades have at least one cyclic "
+                                   "dependency involving %s." % node)
+
+        return map(lambda x: upgrades[x], topo_order)
 
     def _parse_plugin_id(self, plugin_id):
         """Determine repository from plugin id."""
@@ -396,145 +478,51 @@ class InvenioUpgrader(object):
         raise RuntimeError("Repository could not be determined from "
                            "the upgrade identifier: %s." % plugin_id)
 
-    def get_upgrades(self, remove_applied=True):
-        """Get upgrades (ordered according to their dependencies).
 
-        @param remove_applied: Set to false to return all upgrades, otherwise
-            already applied upgrades are removed from their graph (incl. all
-            their dependencies.
+class UpgradeBase(object):
+    """Base class for all upgrades."""
+
+    _depends_on = []
+
+    @property
+    def name(self):
+        """Complete name of the upgrade including the module name.
+
+        This is useful when specifying the dependencies of one upgrade.
         """
-        if self.upgrades is None:
-            plugins = self._load_upgrades(remove_applied=remove_applied)
+        return '{0}:{1}'.format(self.__module__, self.__class__.__name__)
 
-            # List of un-applied upgrades in topological order
-            self.upgrades = map(_upgrade_doc_mapper,
-                                self.order_upgrades(plugins, self.history))
-        return self.upgrades
+    @property
+    def info(self):
+        """First line of the class docstring."""
+        return self.__doc__.splitlines()[0]
 
-    def _create_graph(self, upgrades, history=None):
-        """Create dependency graph from upgrades.
+    @property
+    def depends_on(self):
+        """Wrapper around the class attribute."""
+        return self.__class__._depends_on
 
-        @param upgrades: Dict of upgrades
-        @param history: Dict of applied upgrades
-        """
-        history = history or {}
-        graph_incoming = {}  # nodes their incoming edges
-        graph_outgoing = {}  # nodes their outgoing edges
+    # TODO: review regexp for class naming
+    @property
+    def repository(self):
+        """Repository."""
+        m = re.match("(.+)(_\d{4}_\d{2}_\d{2}_)(.+)", self.__module__)
+        if m:
+            return m.group(1)
+        m = re.match("(.+)(_release_)(.+)", self.__module__)
+        if m:
+            return m.group(1)
 
-        # Create graph data structure
-        for mod in upgrades.values():
-            # Remove all incoming edges from already applied upgrades
-            graph_incoming[mod['id']] = filter(lambda x: x not in history,
-                                               mod['depends_on'])
-            # Build graph_outgoing
-            if mod['id'] not in graph_outgoing:
-                graph_outgoing[mod['id']] = []
-            for edge in graph_incoming[mod['id']]:
-                if edge not in graph_outgoing:
-                    graph_outgoing[edge] = []
-                graph_outgoing[edge].append(mod['id'])
+    def do_upgrade(self):
+        """Implement your upgrades here."""
+        raise NotImplementedError()
 
-        return (graph_incoming, graph_outgoing)
+    def estimate(self):
+        """Estimate running time of upgrade in seconds (optional)."""
+        return 1
 
-    def find_endpoints(self):
-        """Find upgrade end-points (i.e nodes without dependents)."""
-        plugins = self._load_upgrades(remove_applied=False)
+    def pre_upgrade(self):
+        """Run pre-upgrade checks (optional)."""
 
-        dummy_graph_incoming, graph_outgoing = self._create_graph(plugins, {})
-
-        endpoints = {}
-        for node, outgoing in graph_outgoing.items():
-            if not outgoing:
-                repository = plugins[node]['repository']
-                if repository not in endpoints:
-                    endpoints[repository] = []
-                endpoints[repository].append(node)
-
-        return endpoints
-
-    def order_upgrades(self, upgrades, history=None):
-        """Order upgrades according to their dependencies.
-
-        (topological sort using
-        Kahn's algorithm - http://en.wikipedia.org/wiki/Topological_sorting).
-
-        @param upgrades: Dict of upgrades
-        @param history: Dict of applied upgrades
-        """
-        history = history or {}
-        graph_incoming, graph_outgoing = self._create_graph(upgrades, history)
-
-        # Removed already applied upgrades (assumes all dependencies prior to
-        # this upgrade has been applied).
-        for node_id in history.keys():
-            start_nodes = [node_id, ]
-            while start_nodes:
-                node = start_nodes.pop()
-                # Remove from direct dependents
-                try:
-                    for d in graph_outgoing[node]:
-                        graph_incoming[d] = filter(lambda x: x != node,
-                                                   graph_incoming[d])
-                except KeyError:
-                    warnings.warn("Ghost upgrade %s detected" % node)
-
-                # Remove all prior dependencies
-                if node in graph_incoming:
-                    # Get dependencies, remove node, and recursively
-                    # remove all dependencies.
-                    depends_on = graph_incoming[node]
-
-                    # Add dependencies to check
-                    for d in depends_on:
-                        graph_outgoing[d] = filter(lambda x: x != node,
-                                                   graph_outgoing[d])
-                        start_nodes.append(d)
-
-                    del graph_incoming[node]
-
-        # Check for missing dependencies
-        for node_id, depends_on in graph_incoming.items():
-            for d in depends_on:
-                if d not in graph_incoming:
-                    raise RuntimeError("Upgrade %s depends on an unknown"
-                                       " upgrade %s" % (node_id, d))
-
-        # Nodes with no incoming edges
-        start_nodes = filter(lambda x: len(graph_incoming[x]) == 0,
-                             graph_incoming.keys())
-        topo_order = []
-
-        while start_nodes:
-            # Append node_n to list (it has no incoming edges)
-            node_n = start_nodes.pop()
-            topo_order.append(node_n)
-
-            # For each node m with and edge from n to m
-            for node_m in graph_outgoing[node_n]:
-                # Remove the edge n to m
-                graph_incoming[node_m] = filter(lambda x: x != node_n,
-                                                graph_incoming[node_m])
-                # If m has no incoming edges, add it to start_nodes.
-                if not graph_incoming[node_m]:
-                    start_nodes.append(node_m)
-
-        for node, edges in graph_incoming.items():
-            if edges:
-                raise RuntimeError("The upgrades have at least one cyclic "
-                                   "dependency involving %s." % node)
-
-        return map(lambda x: upgrades[x], topo_order)
-
-
-def dummy_signgature():
-    """Dummy function signature for pluginutils."""
-    pass
-
-
-def _upgrade_doc_mapper(x):
-    """Map function for ingesting documentation strings into plug-ins."""
-    try:
-        x["__doc__"] = x['info']().split("\n")[0].strip()
-    except Exception:
-        x["__doc__"] = ''
-    return x
+    def post_upgrade(self):
+        """Run post-upgrade checks (optional)."""

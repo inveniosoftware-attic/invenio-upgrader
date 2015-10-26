@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013, 2014, 2015 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,17 +17,17 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Upgrade command line."""
 
-from __future__ import absolute_import
+"""Click command-line interface for upgrader management."""
 
+from __future__ import absolute_import, print_function
+
+import click
 import os
-import os.path
-
-import sys
 
 from datetime import date
-
+from flask import current_app
+from flask_cli import with_appcontext
 from werkzeug.utils import import_string
 
 from .engine import InvenioUpgrader
@@ -55,90 +55,52 @@ UPGRADE_TEMPLATE = """# -*- coding: utf-8 -*-
 
 import warnings
 
-from invenio_ext.sqlalchemy import db
-from invenio_upgrader.api import op
-from invenio_utils.text import wait_for_user
+from invenio_db import db
+from invenio_upgrader import op, UpgradeBase
 
 from sqlalchemy import *
 
 %(imports)s
 
-# Important: Below is only a best guess. You MUST validate which previous
-# upgrade you depend on.
-depends_on = %(depends_on)s
+class %(cls)s(UpgradeBase):
+    \"\"\"Upgrade description here.\"\"\"
 
+    # Important: Below is only a best guess. You MUST validate which previous
+    # upgrade you depend on.
+    _depends_on = %(depends_on)s
 
-def info():
-    \"\"\"Info message.\"\"\"
-    return "Short description of upgrade displayed to end-user"
+    def do_upgrade(self):
+        \"\"\"Implement your upgrades here.\"\"\"
+    %(operations)s
 
+    def estimate(self):
+        \"\"\"Estimate running time of upgrade in seconds (optional).\"\"\"
+        return 1
 
-def do_upgrade():
-    \"\"\"Implement your upgrades here.\"\"\"
-%(operations)s
+    def pre_upgrade(self):
+        \"\"\"Run pre-upgrade checks (optional).\"\"\"
+        # Example of raising errors:
+        # raise RuntimeError("Description of error 1")
 
-
-def estimate():
-    \"\"\"Estimate running time of upgrade in seconds (optional).\"\"\"
-    return 1
-
-
-def pre_upgrade():
-    \"\"\"Run pre-upgrade checks (optional).\"\"\"
-    # Example of raising errors:
-    # raise RuntimeError("Description of error 1", "Description of error 2")
-
-
-def post_upgrade():
-    \"\"\"Run post-upgrade checks (optional).\"\"\"
-    # Example of issuing warnings:
-    # warnings.warn("A continuable error occurred")
+    def post_upgrade(self):
+        \"\"\"Run post-upgrade checks (optional).\"\"\"
+        # Example of issuing warnings:
+        # warnings.warn("A continuable error occurred")
 """
 
 
-def cmd_upgrade_check(upgrader=None):
-    """Command for running pre-upgrade checks."""
-    if not upgrader:
-        upgrader = InvenioUpgrader()
-    logger = upgrader.get_logger()
-
-    try:
-        # Run upgrade pre-checks
-        upgrades = upgrader.get_upgrades()
-
-        # Check if there's anything to upgrade
-        if not upgrades:
-            logger.info("All upgrades have been applied.")
-            sys.exit(0)
-
-        logger.info("Following upgrade(s) have not been applied yet:")
-        for u in upgrades:
-            title = u['__doc__']
-            if title:
-                logger.info(" * %s (%s)" % (u['id'], title))
-            else:
-                logger.info(" * %s" % u['id'])
-
-        logger.info("Running pre-upgrade checks...")
-        upgrader.pre_upgrade_checks(upgrades)
-        logger.info("Upgrade check successful - estimated time for upgrading"
-                    " Invenio is %s..." % upgrader.human_estimate(upgrades))
-    except RuntimeError as e:
-        for msg in e.args:
-            logger.error(unicode(msg))
-        logger.error("Upgrade check failed. Aborting.")
-        sys.exit(1)
+@click.group()
+def upgrader():
+    """Upgrader management commands."""
 
 
-def cmd_upgrade(upgrader=None):
+@upgrader.command()
+@with_appcontext
+def run():
     """Command for applying upgrades."""
-    from flask import current_app
-    from invenio_utils.text import wrap_text_in_a_box, wait_for_user
-
     logfilename = os.path.join(current_app.config['CFG_LOGDIR'],
                                'invenio_upgrader.log')
-    if not upgrader:
-        upgrader = InvenioUpgrader()
+    upgrader = InvenioUpgrader()
     logger = upgrader.get_logger(logfilename=logfilename)
 
     try:
@@ -151,11 +113,7 @@ def cmd_upgrade(upgrader=None):
         logger.info("Following upgrade(s) will be applied:")
 
         for u in upgrades:
-            title = u['__doc__']
-            if title:
-                logger.info(" * %s (%s)" % (u['id'], title))
-            else:
-                logger.info(" * %s" % u['id'])
+            logger.info(" * %s (%s)" % (u.name, u.info))
 
         logger.info("Running pre-upgrade checks...")
         upgrader.pre_upgrade_checks(upgrades)
@@ -163,16 +121,12 @@ def cmd_upgrade(upgrader=None):
         logger.info("Calculating estimated upgrade time...")
         estimate = upgrader.human_estimate(upgrades)
 
-        wait_for_user(wrap_text_in_a_box(
-            "WARNING: You are going to upgrade your installation "
-            "(estimated time: %s)!" % estimate))
+        click.confirm(
+            "You are going to upgrade your installation "
+            "(estimated time: {0})!".format(estimate), abort=True)
 
         for u in upgrades:
-            title = u['__doc__']
-            if title:
-                logger.info("Applying %s (%s)" % (u['id'], title))
-            else:
-                logger.info("Applying %s" % u['id'])
+            logger.info("Applying %s (%s)" % (u.name, u.info))
             upgrader.apply_upgrade(u)
 
         logger.info("Running post-upgrade checks...")
@@ -189,13 +143,46 @@ def cmd_upgrade(upgrader=None):
             logger.error(unicode(msg))
         logger.info("Please check log file for further information:\n"
                     "less %s" % logfilename)
-        sys.exit(1)
+        click.Abort()
 
 
-def cmd_upgrade_show_pending(upgrader=None):
+@upgrader.command()
+@with_appcontext
+def check():
+    """Command for checking upgrades."""
+    upgrader = InvenioUpgrader()
+    logger = upgrader.get_logger()
+
+    try:
+        # Run upgrade pre-checks
+        upgrades = upgrader.get_upgrades()
+
+        # Check if there's anything to upgrade
+        if not upgrades:
+            logger.info("All upgrades have been applied.")
+            return
+
+        logger.info("Following upgrade(s) have not been applied yet:")
+        for u in upgrades:
+            logger.info(
+                " * {0} {1}".format(u.name, u.info))
+
+        logger.info("Running pre-upgrade checks...")
+        upgrader.pre_upgrade_checks(upgrades)
+        logger.info("Upgrade check successful - estimated time for upgrading"
+                    " Invenio is %s..." % upgrader.human_estimate(upgrades))
+    except RuntimeError as e:
+        for msg in e.args:
+            logger.error(unicode(msg))
+        logger.error("Upgrade check failed. Aborting.")
+        raise
+
+
+@upgrader.command()
+@with_appcontext
+def pending():
     """Command for showing upgrades ready to be applied."""
-    if not upgrader:
-        upgrader = InvenioUpgrader()
+    upgrader = InvenioUpgrader()
     logger = upgrader.get_logger()
 
     try:
@@ -208,21 +195,19 @@ def cmd_upgrade_show_pending(upgrader=None):
         logger.info("Following upgrade(s) are ready to be applied:")
 
         for u in upgrades:
-            title = u['__doc__']
-            if title:
-                logger.info(" * %s (%s)" % (u['id'], title))
-            else:
-                logger.info(" * %s" % u['id'])
+            logger.info(
+                " * {0} {1}".format(u.name, u.info))
     except RuntimeError as e:
         for msg in e.args:
             logger.error(unicode(msg))
-        sys.exit(1)
+        raise
 
 
-def cmd_upgrade_show_applied(upgrader=None):
+@upgrader.command()
+@with_appcontext
+def applied():
     """Command for showing all upgrades already applied."""
-    if not upgrader:
-        upgrader = InvenioUpgrader()
+    upgrader = InvenioUpgrader()
     logger = upgrader.get_logger()
 
     try:
@@ -239,14 +224,16 @@ def cmd_upgrade_show_applied(upgrader=None):
     except RuntimeError as e:
         for msg in e.args:
             logger.error(unicode(msg))
-        sys.exit(1)
+        raise
 
 
-def cmd_upgrade_create_release_recipe(pkg_path, repository=None,
-                                      output_path=None, upgrader=None):
-    """Create a new release upgrade recipe (for developers)."""
-    if not upgrader:
-        upgrader = InvenioUpgrader()
+@upgrader.command()
+@click.option('-p', '--path')
+@click.option('-r', '--repository', default='invenio')
+@with_appcontext
+def release(path, repository):
+    """Create a new release upgrade recipe, for developers."""
+    upgrader = InvenioUpgrader()
     logger = upgrader.get_logger()
 
     try:
@@ -254,35 +241,44 @@ def cmd_upgrade_create_release_recipe(pkg_path, repository=None,
 
         if not endpoints:
             logger.error("No upgrades found.")
-            sys.exit(1)
+            click.Abort()
 
         depends_on = []
         for repo, upgrades in endpoints.items():
             depends_on.extend(upgrades)
 
-        return cmd_upgrade_create_standard_recipe(pkg_path,
-                                                  repository=repository,
-                                                  depends_on=depends_on,
-                                                  release=True,
-                                                  output_path=output_path,
-                                                  upgrader=upgrader)
+        return recipe(path,
+                      repository=repository,
+                      depends_on=depends_on,
+                      release=True,
+                      output_path=output_path)
+
     except RuntimeError as e:
         for msg in e.args:
             logger.error(unicode(msg))
-        sys.exit(1)
+        raise
 
 
-def cmd_upgrade_create_standard_recipe(pkg_path, repository=None,
-                                       depends_on=None, release=False,
-                                       upgrader=None, output_path=None,
-                                       auto=False, overwrite=False, name=None):
-    """Create a new upgrade recipe (for developers)."""
-    if not upgrader:
-        upgrader = InvenioUpgrader()
+@upgrader.command()
+@click.option('-p', '--package', required=True,
+              help="Import path of module where to create recipe (required).")
+@click.option('-o', '--path', 'output_path', help="Override output path.")
+@click.option('-r', '--repository', help="Override repository name")
+@click.option('-n', '--name', help="Name of upgrade file")
+@click.option('-d', '--depends_on', help="List of recipes to depend on.")
+@click.option('-a', '--auto', is_flag=True, default=False,
+              help="Auto-generate upgrade (default: False).")
+@click.option('--release', is_flag=True, default=False)
+@click.option('--overwrite', is_flag=True, default=False)
+@with_appcontext
+def recipe(package, repository=None, depends_on=None, release=False,
+           output_path=None, auto=False, overwrite=False, name=None):
+    """Create a new upgrade recipe, for developers."""
+    upgrader = InvenioUpgrader()
     logger = upgrader.get_logger()
 
     try:
-        path, found_repository = _upgrade_recipe_find_path(pkg_path)
+        path, found_repository = _upgrade_recipe_find_path(package)
 
         if output_path:
             path = output_path
@@ -313,8 +309,7 @@ def cmd_upgrade_create_standard_recipe(pkg_path, repository=None,
 
         upgrade_file = os.path.join(path, filename)
 
-        if os.path.exists(upgrade_file):
-            if not overwrite:
+        if os.path.exists(upgrade_file) and not overwrite:
                 raise RuntimeError(
                     "Could not generate upgrade - %s already exists."
                     % upgrade_file
@@ -329,23 +324,25 @@ def cmd_upgrade_create_standard_recipe(pkg_path, repository=None,
                 depends_on = [u]
 
         # Write upgrade template file
-        _write_template(upgrade_file, depends_on, repository, auto=auto)
+        _write_template(
+            upgrade_file, name or 'rename_me',
+            depends_on, repository, auto=auto)
 
         logger.info("Created new upgrade %s" % upgrade_file)
     except RuntimeError as e:
         for msg in e.args:
             logger.error(unicode(msg))
-        sys.exit(1)
+        raise
 
 
 #
 # Helper functions
 #
-def _write_template(upgrade_file, depends_on, repository, auto=False):
+def _write_template(upgrade_file, name, depends_on, repository, auto=False):
     """Write template to upgrade file."""
     if auto:
         # Ensure all models are loaded
-        from invenio_ext.sqlalchemy import models
+        from invenio_db import models
         list(models)
         template_args = produce_upgrade_operations()
         operations_str = template_args['upgrades']
@@ -360,7 +357,8 @@ def _write_template(upgrade_file, depends_on, repository, auto=False):
             'repository': repository,
             'year': date.today().year,
             'operations': operations_str,
-            'imports': import_str
+            'imports': import_str,
+            'cls': ''.join(w.capitalize() or '_' for w in name.split('_'))
         })
 
 

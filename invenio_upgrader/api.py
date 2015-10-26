@@ -17,11 +17,9 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-API that upgrades can rely on for manipulating the database.
-"""
+"""API that upgrades can rely on for manipulating the database."""
 
 from __future__ import absolute_import
 from .operations import op
 
-__all__ = ['op']
+__all__ = ('op', )

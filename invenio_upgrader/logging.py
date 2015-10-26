@@ -17,17 +17,21 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Custom logging."""
+
 from __future__ import absolute_import
 
 import logging
 
 
 class InvenioUpgraderLogFormatter(logging.Formatter):
+    """Custom logging formatter.
+
+    Allows different log formats for different error levels.
     """
-    Custom logging formatter allowing different log formats for different
-    error levels.
-    """
+
     def __init__(self, fmt, **overwrites):
+        """Init."""
         self.fmt = fmt
         self.overwrites = overwrites
         self.prefix = ''
@@ -35,7 +39,7 @@ class InvenioUpgraderLogFormatter(logging.Formatter):
         logging.Formatter.__init__(self, fmt)
 
     def get_level_fmt(self, level):
-        """ Get format for log level """
+        """Get format for log level."""
         key = None
         if level == logging.DEBUG:
             key = 'debug'
@@ -50,7 +54,7 @@ class InvenioUpgraderLogFormatter(logging.Formatter):
         return self.overwrites.get(key, self.fmt)
 
     def format(self, record):
-        """ Format log record """
+        """Format log record."""
         format_orig = self._fmt
         self._fmt = self.get_level_fmt(record.levelno)
         record.prefix = self.prefix

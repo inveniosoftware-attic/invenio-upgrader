@@ -17,9 +17,7 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-Objects for inspect and manipulating the database structure. Based on Alembic.
-"""
+"""Objects for inspect and manipulating the database structure (Alembic)."""
 
 from __future__ import absolute_import
 
@@ -28,7 +26,7 @@ from alembic.environment import EnvironmentContext
 from alembic.operations import Operations
 from alembic.autogenerate.api import _produce_migration_diffs
 from alembic.config import Config
-from invenio_ext.sqlalchemy import db
+from invenio_db import db
 
 
 op = LocalProxy(lambda: create_operations())

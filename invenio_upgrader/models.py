@@ -17,16 +17,18 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
+"""Upgrader models.
+
 Upgrade engine database model for keeping log of which upgrades have been
 applied to to a given database.
 """
 
-from invenio_ext.sqlalchemy import db
+from invenio_db import db
 
 
 class Upgrade(db.Model):
     """Represents an Upgrade record."""
+
     __tablename__ = 'upgrade'
 
     upgrade = db.Column(db.String(255), primary_key=True, nullable=False)

@@ -22,4 +22,45 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
--e git+git://github.com/inveniosoftware/invenio-db.git#egg=invenio-db
+
+"""Minimal Flask application example for development.
+
+Create database and tables:
+.. code-block:: console
+   $ cd examples
+   $ flask -a app.py db init
+   $ flask -a app.py db create
+
+
+Common upgrader commands:
+
+.. code-block:: console
+   $ flask -a app.py upgrader pending
+"""
+
+from __future__ import absolute_import, print_function
+
+import os
+
+from flask import Flask
+from flask_cli import FlaskCLI
+from invenio_db import InvenioDB
+
+from invenio_upgrader import InvenioUpgrader
+
+# Create Flask application
+app = Flask(__name__)
+app.config.update(
+    SECRET_KEY="CHANGE_ME",
+    SQLALCHEMY_DATABASE_URI=os.environ.get(
+        'SQLALCHEMY_DATABASE_URI', 'sqlite:///test.db'
+    ),
+    CFG_LOGDIR='/tmp',
+    TESTING=True,
+)
+FlaskCLI(app)
+InvenioDB(app)
+InvenioUpgrader(app)
+
+if __name__ == "__main__":
+    app.run()

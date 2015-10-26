@@ -74,15 +74,16 @@ the graph and will refuse to run any upgrades until the cycles have been
 broken.
 """
 
-from invenio_base import signals
-from invenio_base.scripts.database import create, recreate
+from __future__ import absolute_import
 
+from .api import op
+from .engine import UpgradeBase
+from .ext import InvenioUpgrader
+from .version import __version__
 
-def populate_existing_upgrades(sender, yes_i_know=False, drop=True, **kwargs):
-    """Populate existing upgrades."""
-    from .engine import InvenioUpgrader
-    iu = InvenioUpgrader()
-    map(iu.register_success, iu._load_upgrades().values())
-
-signals.post_command.connect(populate_existing_upgrades, sender=create)
-signals.post_command.connect(populate_existing_upgrades, sender=recreate)
+__all__ = (
+    'InvenioUpgrader',
+    'UpgradeBase',
+    'op',
+    '__version__',
+)

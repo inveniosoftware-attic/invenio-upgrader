@@ -22,4 +22,22 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
--e git+git://github.com/inveniosoftware/invenio-db.git#egg=invenio-db
+"""Upgrader engine for Invenio modules."""
+
+from __future__ import absolute_import, print_function
+
+from .cli import upgrader as upgrader_cmd
+
+
+class InvenioUpgrader(object):
+    """Invenio-Upgrader extension."""
+
+    def __init__(self, app=None):
+        """Extension initialization."""
+        if app:
+            self.init_app(app)
+
+    def init_app(self, app):
+        """Flask application initialization."""
+        app.cli.add_command(upgrader_cmd)
+        app.extensions['invenio-upgrader'] = self
