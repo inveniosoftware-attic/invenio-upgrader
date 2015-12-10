@@ -22,9 +22,9 @@
 import warnings
 
 from invenio_db import db
-from invenio_upgrader import op, UpgradeBase
-
 from sqlalchemy.sql import text
+
+from invenio_upgrader import UpgradeBase, op
 
 
 class LegacyRemoval(UpgradeBase):

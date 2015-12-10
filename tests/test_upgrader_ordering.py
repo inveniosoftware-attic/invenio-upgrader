@@ -38,6 +38,7 @@ def upgrades_str(ls):
     """Generate string containing a list of upgrades."""
     class Xcls(object):
         """Helper to create a string out of a list of upgrades."""
+
         def __init__(self, id_val):
             self.id = id_val
 

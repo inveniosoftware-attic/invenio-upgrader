@@ -1,8 +1,8 @@
 =========================
- Invenio-Upgrader v0.2.0
+ Invenio-Upgrader v1.0.0
 =========================
 
-Invenio-Upgrader v0.2.0 was released on October 5, 2015.
+Invenio-Upgrader v1.0.0 was released on October 5, 2015.
 
 About
 -----
@@ -20,12 +20,12 @@ Incompatible changes
 Installation
 ------------
 
-   $ pip install invenio-upgrader==0.2.0
+   $ pip install invenio-upgrader==1.0.0
 
 Documentation
 -------------
 
-   http://invenio-upgrader.readthedocs.org/en/v0.2.0
+   http://pythonhosted.org/invenio-upgrader/
 
 Happy hacking and thanks for flying Invenio-Upgrader.
 

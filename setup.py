@@ -36,8 +36,8 @@ history = open('CHANGES.rst').read()
 
 tests_require = [
     'check-manifest>=0.25',
-    'Flask_Testing>=0.4.1',
     'coverage>=4.0',
+    'Flask-Testing>=0.4.1',
     'isort>=4.2.2',
     'pep257>=0.7.0',
     'pytest-cache>=1.0',
@@ -49,26 +49,31 @@ tests_require = [
 
 extras_require = {
     'docs': [
-        "Sphinx>=1.3",
+        'Sphinx>=1.3',
+    ],
+    'postgresql': [
+        'invenio-db[postgresql]>=1.0.0a6',
+    ],
+    'mysql': [
+        'invenio-db[mysql]>=1.0.0a6',
+    ],
+    'sqlite': [
+        'invenio-db>=1.0.0a6',
     ],
     'tests': tests_require,
 }
 
 extras_require['all'] = []
-for reqs in extras_require.values():
+for name, reqs in extras_require.items():
+    if name in ('postgresql', 'mysql', 'sqlite'):
+        continue
     extras_require['all'].extend(reqs)
 
-setup_requires = [
-    'Babel>=1.3',
-]
-
 install_requires = [
-    'Flask-BabelEx>=0.9.2',
-    'Flask-Cli>=0.2.1',
-    'Flask>=0.10.1',
+    'Flask-CLI>=0.2.1',
+    'Flask>=0.10',
     'alembic>=0.7,<0.8',
     'click>=5.0',
-    'invenio-db>=1.0.0a4',
     'six>=1.7.2',
 ]
 
@@ -147,7 +152,6 @@ setup(
     },
     extras_require=extras_require,
     install_requires=install_requires,
-    setup_requires=setup_requires,
     tests_require=tests_require,
     classifiers=[
         'Environment :: Web Environment',
