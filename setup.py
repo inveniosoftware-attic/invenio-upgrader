@@ -70,8 +70,7 @@ for name, reqs in extras_require.items():
     extras_require['all'].extend(reqs)
 
 install_requires = [
-    'Flask-CLI>=0.2.1',
-    'Flask>=0.10',
+    'Flask>=0.11.1',
     'alembic>=0.7,<0.8',
     'click>=5.0',
     'six>=1.7.2',
