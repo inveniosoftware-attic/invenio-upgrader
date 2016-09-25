@@ -32,6 +32,7 @@ include .editorconfig .dockerignore
 include .travis.yml
 include .tx/config
 include babel.ini
+include docs/requirements.txt
 include LICENSE
 include pytest.ini
 include tox.ini
