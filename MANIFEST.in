@@ -32,7 +32,9 @@ include .editorconfig .dockerignore
 include .travis.yml
 include .tx/config
 include babel.ini
+include .lgtm
 include LICENSE
+include MAINTAINERS
 include pytest.ini
 include tox.ini
 recursive-include docs *.bat
