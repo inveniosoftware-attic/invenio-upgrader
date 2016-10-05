@@ -138,8 +138,8 @@ html_theme_options = {
     'github_banner': True,
     'show_powered_by': False,
     'extra_nav_links': {
-        'invenio-upgrader@GitHub': 'http://github.com/inveniosoftware/invenio-upgrader',
-        'invenio-upgrader@PyPI': 'http://pypi.python.org/pypi/invenio-upgrader/',
+        'invenio-upgrader@GitHub': 'https://github.com/inveniosoftware/invenio-upgrader',
+        'invenio-upgrader@PyPI': 'https://pypi.python.org/pypi/invenio-upgrader/',
     }
 }
 
@@ -330,3 +330,6 @@ texinfo_documents = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'https://docs.python.org/': None}
+
+# Autodoc configuraton.
+autoclass_content = 'both'
